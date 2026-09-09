@@ -2,6 +2,10 @@
   "version": "1.0",
   "files": [
     {
+      "file": "anatomy.json",
+      "section": "Anatomy"
+    },
+    {
       "file": "cardiology.json",
       "section": "Cardiology"
     },
@@ -11,11 +15,11 @@
     },
     {
       "file": "para3.json",
-      "section": "parasitology"
+      "section": "Para 3"
     },
     {
-      "file": "anatomy.json",
-      "section": "Anatomy"
+      "file": "pharma25.json",
+      "section": "Pharma 25"
     }
   ]
 }
