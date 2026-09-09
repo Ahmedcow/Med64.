@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Custom Exam & Section Manager</title>
+
+  <!-- Load React & ReactDOM via CDN -->
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+
+  <!-- Load Babel to compile JSX inside the browser -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #f4f6f8;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Root React App Container -->
+  <div id="root"></div>
+
+  <!-- React Code with Babel Compiler -->
+  <script type="text/babel">
+    const { useState, useMemo } = React;
+
+    // Default initial state structure
+    const initialSections = [
+      {
+        id: 'sec_01',
+        name: 'Anatomy - Cardiovascular',
+        files: [
+          {
+            id: 'file_101',
+            filename: 'heart_anatomy_q1.json',
+            categories: { MCQ: 2, 'True/False': 2 },
+            questions: [
+              { id: 'q1', text: 'Which chamber pumps oxygenated blood to the body?', category: 'MCQ', options: ['Left Ventricle', 'Right Atrium', 'Right Ventricle'], answer: 'Left Ventricle' },
+              { id: 'q2', text: 'The pulmonary artery carries oxygenated blood.', category: 'True/False', options: ['True', 'False'], answer: 'False' },
+              { id: 'q3', text: 'How many valves does the human heart have?', category: 'MCQ', options: ['2', '4', '6'], answer: '4' },
+              { id: 'q4', text: 'The aorta is the main artery of the body.', category: 'True/False', options: ['True', 'False'], answer: 'True' }
+            ]
+          }
+        ]
+      }
+    ];
+
+    function App() {
+      const [activeTab, setActiveTab] = useState('sections'); // 'sections' | 'exam' | 'active_exam'
+      const [sections, setSections] = useState(initialSections);
+      
+      // Modal state for file uploads
+      const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+      const [pendingFileData, setPendingFileData] = useState(null);
+
+      // Active exam state
+      const [generatedExam, setGeneratedExam] = useState(null);
+
+      // --- Handlers for File Upload & Parsing ---
+      const handleFileUpload = (event) => {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          try {
+            const parsed = JSON.parse(e.target.result);
+            
+            // Count questions per category in the file
+            const categories = {};
+            if (Array.isArray(parsed)) {
+              parsed.forEach((q) => {
+                const cat = q.category || 'General';
+                categories[cat] = (categories[cat] || 0) + 1;
+              });
+            }
+
+            setPendingFileData({
+              id: `file_${Date.now()}`,
+              filename: file.name,
+              categories,
+              questions: parsed
+            });
+            
+            setIsUploadModalOpen(true);
+          } catch (err) {
+            alert('Invalid JSON file format. Please upload a valid JSON array of questions.');
+          }
+        };
+        reader.readAsText(file);
+        event.target.value = '';
+      };
+
+      const assignFileToSection = (sectionName, isNewSection) => {
+        if (!pendingFileData) return;
+
+        setSections((prev) => {
+          if (isNewSection) {
+            return [
+              ...prev,
+              {
+                id: `sec_${Date.now()}`,
+                name: sectionName,
+                files: [pendingFileData]
+              }
+            ];
+          } else {
+            return prev.map((sec) =>
+              sec.name === sectionName
+                ? { ...sec, files: [...sec.files, pendingFileData] }
+                : sec
+            );
+          }
+        });
+
+        setIsUploadModalOpen(false);
+        setPendingFileData(null);
+      };
+
+      // --- Exam Question Filtering & Shuffling ---
+      const handleStartExam = (config) => {
+        const { sectionId, selectedFileIds, categoryCounts, timeLimitMinutes } = config;
+        const targetSection = sections.find((s) => s.id === sectionId);
+        if (!targetSection) return;
+
+        // 1. Gather questions from selected JSON files in section
+        const selectedFiles = targetSection.files.filter((f) => selectedFileIds.includes(f.id));
+        let poolByCategory = {};
+
+        selectedFiles.forEach((file) => {
+          file.questions.forEach((q) => {
+            const cat = q.category || 'General';
+            if (!poolByCategory[cat]) poolByCategory[cat] = [];
+            poolByCategory[cat].push(q);
+          });
+        });
+
+        // 2. Fisher-Yates Shuffle
+        const shuffleArray = (arr) => {
+          const array = [...arr];
+          for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+          }
+          return array;
+        };
+
+        // 3. Extract exact requested question counts per category
+        let selectedQuestions = [];
+        Object.entries(categoryCounts).forEach(([category, count]) => {
+          if (poolByCategory[category] && count > 0) {
+            const shuffledCategoryPool = shuffleArray(poolByCategory[category]);
+            selectedQuestions.push(...shuffledCategoryPool.slice(0, count));
+          }
+        });
+
+        // 4. Final shuffle across all categories
+        const finalExamQuestions = shuffleArray(selectedQuestions);
+
+        setGeneratedExam({
+          duration: timeLimitMinutes,
+          questions: finalExamQuestions
+        });
+        setActiveTab('active_exam');
+      };
+
+      return (
+        <div style={styles.container}>
+          {/* Sub Navigation Bar */}
+          <nav style={styles.subBar}>
+            <button
+              onClick={() => setActiveTab('sections')}
+              style={{ ...styles.navButton, fontWeight: activeTab === 'sections' ? 'bold' : 'normal' }}
+            >
+              Sections
+            </button>
+            <button
+              onClick={() => setActiveTab('exam')}
+              style={{ ...styles.navButton, fontWeight: activeTab === 'exam' ? 'bold' : 'normal' }}
+            >
+              Configure Exam
+            </button>
+          </nav>
+
+          {/* Dynamic Views */}
+          {activeTab === 'sections' && (
+            <SectionsView sections={sections} onFileUpload={handleFileUpload} />
+          )}
+
+          {activeTab === 'exam' && (
+            <ExamConfiguratorView sections={sections} onStartExam={handleStartExam} />
+          )}
+
+          {activeTab === 'active_exam' && generatedExam && (
+            <ActiveExamView exam={generatedExam} onExit={() => setActiveTab('exam')} />
+          )}
+
+          {/* Upload Section Modal */}
+          {isUploadModalOpen && (
+            <UploadSectionModal
+              sections={sections}
+              onConfirm={assignFileToSection}
+              onClose={() => setIsUploadModalOpen(false)}
+            />
+          )}
+        </div>
+      );
+    }
+
+    // --- SUB-BAR SECTION VIEW ---
+    function SectionsView({ sections, onFileUpload }) {
+      return (
+        <div>
+          <h2>Sections Manager</h2>
+          <div style={styles.uploadCard}>
+            <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>
+              Upload JSON File:
+            </label>
+            <input type="file" accept=".json" onChange={onFileUpload} />
+          </div>
+
+          {sections.map((section) => (
+            <div key={section.id} style={styles.card}>
+              <h3 style={{ margin: '0 0 10px 0' }}>📂 Section: {section.name}</h3>
+              {section.files.length === 0 ? (
+                <p style={{ color: '#666', fontSize: '14px' }}>No JSON files added to this section yet.</p>
+              ) : (
+                <ul style={{ margin: 0, paddingLeft: '20px' }}>
+                  {section.files.map((f) => (
+                    <li key={f.id} style={{ marginBottom: '5px' }}>
+                      <strong>{f.filename}</strong> — Categories: {
+                        Object.entries(f.categories).map(([cat, count]) => `${cat} (${count})`).join(', ')
+                      }
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          ))}
+        </div>
+      );
+    }
+
+    // --- FILE TO SECTION ASSIGNMENT MODAL ---
+    function UploadSectionModal({ sections, onConfirm, onClose }) {
+      const [selectedSection, setSelectedSection] = useState(sections[0]?.name || '');
+      const [newSectionName, setNewSectionName] = useState('');
+      const [isCreatingNew, setIsCreatingNew] = useState(sections.length === 0);
+
+      const handleSubmit = (e) => {
+        e.preventDefault();
+        if (isCreatingNew) {
+          if (!newSectionName.trim()) return alert('Please enter a section name.');
+          onConfirm(newSectionName.trim(), true);
+        } else {
+          onConfirm(selectedSection, false);
+        }
+      };
+
+      return (
+        <div style={styles.overlay}>
+          <div style={styles.modal}>
+            <h3>Assign JSON File to Section</h3>
+            <form onSubmit={handleSubmit}>
+              {sections.length > 0 && (
+                <div style={{ marginBottom: '15px' }}>
+                  <label style={{ cursor: 'pointer' }}>
+                    <input
+                      type="radio"
+                      name="sectionMode"
+                      checked={!isCreatingNew}
+                      onChange={() => setIsCreatingNew(false)}
+                    />
+                    Assign to Existing Section
+                  </label>
+                  {!isCreatingNew && (
+                    <select
+                      value={selectedSection}
+                      onChange={(e) => setSelectedSection(e.target.value)}
+                      style={styles.input}
+                    >
+                      {sections.map((s) => (
+                        <option key={s.id} value={s.name}>{s.name}</option>
+                      ))}
+                    </select>
+                  )}
+                </div>
+              )}
+
+              <div style={{ marginBottom: '20px' }}>
+                <label style={{ cursor: 'pointer' }}>
+                  <input
+                    type="radio"
+                    name="sectionMode"
+                    checked={isCreatingNew}
+                    onChange={() => setIsCreatingNew(true)}
+                  />
+                  Create New Section
+                </label>
+                {isCreatingNew && (
+                  <input
+                    type="text"
+                    placeholder="e.g., Biochemistry"
+                    value={newSectionName}
+                    onChange={(e) => setNewSectionName(e.target.value)}
+                    style={styles.input}
+                  />
+                )}
+              </div>
+
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
+                <button type="button" onClick={onClose} style={styles.buttonSecondary}>Cancel</button>
+                <button type="submit" style={styles.buttonPrimary}>Save File</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      );
+    }
+
+    // --- EXAM CONFIGURATOR VIEW ---
+    function ExamConfiguratorView({ sections, onStartExam }) {
+      const [selectedSectionId, setSelectedSectionId] = useState(sections[0]?.id || '');
+      const [selectedFileIds, setSelectedFileIds] = useState([]);
+      const [timeLimitMinutes, setTimeLimitMinutes] = useState(30);
+      const [categoryCounts, setCategoryCounts] = useState({});
+
+      const currentSection = useMemo(
+        () => sections.find((s) => s.id === selectedSectionId),
+        [sections, selectedSectionId]
+      );
+
+      const availableCategories = useMemo(() => {
+        if (!currentSection) return {};
+        const selectedFiles = currentSection.files.filter((f) => selectedFileIds.includes(f.id));
+        
+        const aggregated = {};
+        selectedFiles.forEach((file) => {
+          Object.entries(file.categories).forEach(([category, count]) => {
+            aggregated[category] = (aggregated[category] || 0) + count;
+          });
+        });
+        return aggregated;
+      }, [currentSection, selectedFileIds]);
+
+      const handleFileToggle = (fileId) => {
+        setSelectedFileIds((prev) =>
+          prev.includes(fileId) ? prev.filter((id) => id !== fileId) : [...prev, fileId]
+        );
+      };
+
+      const handleCategoryCountChange = (category, value) => {
+        const maxAvailable = availableCategories[category] || 0;
+        const numValue = Math.max(0, Math.min(Number(value), maxAvailable));
+        setCategoryCounts((prev) => ({ ...prev, [category]: numValue }));
+      };
+
+      const handleSubmit = (e) => {
+        e.preventDefault();
+        const totalSelectedQuestions = Object.values(categoryCounts).reduce((a, b) => a + b, 0);
+        if (totalSelectedQuestions === 0) {
+          alert('Please select at least 1 question across your chosen categories.');
+          return;
+        }
+        onStartExam({
+          sectionId: selectedSectionId,
+          selectedFileIds,
+          categoryCounts,
+          timeLimitMinutes
+        });
+      };
+
+      return (
+        <div>
+          <h2>Exam Customizer</h2>
+          <form onSubmit={handleSubmit}>
+            {/* Step 1: Select Section */}
+            <div style={styles.card}>
+              <label style={styles.boldLabel}>1. Select Section:</label>
+              <select
+                value={selectedSectionId}
+                onChange={(e) => {
+                  setSelectedSectionId(e.target.value);
+                  setSelectedFileIds([]);
+                  setCategoryCounts({});
+                }}
+                style={styles.input}
+              >
+                {sections.map((sec) => (
+                  <option key={sec.id} value={sec.id}>{sec.name}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Step 2: Select Source Files */}
+            {currentSection && (
+              <div style={styles.card}>
+                <label style={styles.boldLabel}>2. Choose Source File(s):</label>
+                {currentSection.files.length === 0 ? (
+                  <p style={{ color: '#888' }}>No JSON files in this section.</p>
+                ) : (
+                  currentSection.files.map((file) => (
+                    <div key={file.id} style={{ marginTop: '8px' }}>
+                      <label style={{ cursor: 'pointer' }}>
+                        <input
+                          type="checkbox"
+                          checked={selectedFileIds.includes(file.id)}
+                          onChange={() => handleFileToggle(file.id)}
+                        />{' '}
+                        {file.filename}
+                      </label>
+                    </div>
+                  ))
+                )}
+              </div>
+            )}
+
+            {/* Step 3: Question Count per Category */}
+            {Object.keys(availableCategories).length > 0 && (
+              <div style={styles.card}>
+                <label style={styles.boldLabel}>3. Questions per Category:</label>
+                {Object.entries(availableCategories).map(([cat, maxCount]) => (
+                  <div key={cat} style={styles.categoryRow}>
+                    <span>{cat} (Max: {maxCount})</span>
+                    <input
+                      type="number"
+                      min="0"
+                      max={maxCount}
+                      value={categoryCounts[cat] || 0}
+                      onChange={(e) => handleCategoryCountChange(cat, e.target.value)}
+                      style={{ width: '80px', padding: '5px' }}
+                    />
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Step 4: Time Limit */}
+            <div style={styles.card}>
+              <label style={styles.boldLabel}>4. Exam Time Limit (Minutes):</label>
+              <input
+                type="number"
+                min="1"
+                value={timeLimitMinutes}
+                onChange={(e) => setTimeLimitMinutes(Number(e.target.value))}
+                style={{ width: '100px', padding: '6px', marginTop: '8px' }}
+              />
+            </div>
+
+            <button
+              type="submit"
+              disabled={selectedFileIds.length === 0}
+              style={{
+                ...styles.buttonPrimary,
+                opacity: selectedFileIds.length === 0 ? 0.5 : 1,
+                cursor: selectedFileIds.length === 0 ? 'not-allowed' : 'pointer'
+              }}
+            >
+              Generate & Start Exam
+            </button>
+          </form>
+        </div>
+      );
+    }
+
+    // --- ACTIVE EXAM INTERFACE ---
+    function ActiveExamView({ exam, onExit }) {
+      return (
+        <div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
+            <h2>Exam Session Active</h2>
+            <button onClick={onExit} style={styles.buttonSecondary}>Exit Exam</button>
+          </div>
+
+          <div style={{ padding: '10px 15px', background: '#e9ecef', borderRadius: '4px', marginBottom: '20px' }}>
+            ⏱️ Time Limit: <strong>{exam.duration} Minutes</strong> | Total Questions: <strong>{exam.questions.length}</strong>
+          </div>
+
+          {exam.questions.map((q, idx) => (
+            <div key={q.id || idx} style={styles.card}>
+              <h4>Q{idx + 1}. [{q.category || 'General'}] {q.text}</h4>
+              {q.options && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  {q.options.map((opt, optIdx) => (
+                    <label key={optIdx} style={{ cursor: 'pointer' }}>
+                      <input type="radio" name={`q_${idx}`} value={opt} /> {opt}
+                    </label>
+                  ))}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      );
+    }
+
+    // --- INLINE STYLES ---
+    const styles = {
+      container: { fontFamily: 'Arial, sans-serif', maxWidth: '800px', margin: '30px auto', padding: '20px', backgroundColor: '#fff', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' },
+      subBar: { display: 'flex', gap: '10px', marginBottom: '20px', borderBottom: '2px solid #ddd', paddingBottom: '10px' },
+      navButton: { padding: '8px 16px', background: '#f0f0f0', border: '1px solid #ccc', borderRadius: '4px', cursor: 'pointer' },
+      card: { border: '1px solid #ddd', padding: '15px', borderRadius: '6px', marginBottom: '15px', background: '#fff' },
+      uploadCard: { border: '2px dashed #007bff', padding: '15px', borderRadius: '6px', marginBottom: '20px', background: '#f8f9fa' },
+      boldLabel: { fontWeight: 'bold', display: 'block' },
+      input: { width: '100%', padding: '8px', marginTop: '6px', borderRadius: '4px', border: '1px solid #ccc', boxSizing: 'border-box' },
+      categoryRow: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '8px' },
+      overlay: { position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center' },
+      modal: { background: '#fff', padding: '20px', borderRadius: '8px', width: '380px', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' },
+      buttonPrimary: { padding: '10px 20px', background: '#007bff', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' },
+      buttonSecondary: { padding: '8px 15px', background: '#6c757d', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }
+    };
+
+    // Render the React application into the DOM
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
+</body>
+</html>
