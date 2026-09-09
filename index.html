@@ -1300,9 +1300,12 @@
 
         // --- BUILT-IN GITHUB / VERCEL QUESTION BANK ---
         // Question files are listed in /questions/index.json.
-        // Example: /questions/cardiology.json, /questions/anatomy.json
-        // This makes the question bank easy to maintain as it grows.
+        // Each manifest entry can rename/re-group a file WITHOUT changing this HTML.
+        // Example:
+        // { "file": "lecture1.json", "section": "Cardiology", "category": "Heart Failure" }
+        // Multiple files may use the same section.
         async function loadBuiltInQuestions() {
+            const BUILTIN_IDS_KEY = 'med64_builtin_question_ids';
             try {
                 const manifestResponse = await fetch('./questions/index.json', { cache: 'no-store' });
                 if (!manifestResponse.ok) throw new Error(`Manifest HTTP ${manifestResponse.status}`);
@@ -1311,38 +1314,58 @@
                 const files = Array.isArray(manifest) ? manifest : manifest.files;
                 if (!Array.isArray(files)) throw new Error('questions/index.json must contain a files array.');
 
-                const results = await Promise.all(files.map(async entry => {
-                    const file = typeof entry === 'string' ? entry : entry.file;
-                    if (!file) return [];
+                const entries = files.map(entry => {
+                    if (typeof entry === 'string') return { file: entry };
+                    return entry || {};
+                }).filter(entry => entry.file);
 
-                    const response = await fetch(`./questions/${file}`, { cache: 'no-store' });
-                    if (!response.ok) throw new Error(`${file}: HTTP ${response.status}`);
+                const results = await Promise.all(entries.map(async entry => {
+                    const response = await fetch(`./questions/${entry.file}`, { cache: 'no-store' });
+                    if (!response.ok) throw new Error(`${entry.file}: HTTP ${response.status}`);
 
                     const data = await response.json();
-                    return Array.isArray(data) ? data : (Array.isArray(data.questions) ? data.questions : []);
+                    const questions = Array.isArray(data)
+                        ? data
+                        : (Array.isArray(data.questions) ? data.questions : []);
+
+                    // Manifest values override values inside the JSON file.
+                    // This lets you rename a section/category or put multiple files
+                    // into the same section without touching index.html.
+                    return questions.map(q => ({
+                        ...q,
+                        section: entry.section || q.section || q.category || 'General',
+                        category: entry.category || q.category || entry.section || q.section || 'General',
+                        _med64Builtin: true,
+                        _med64SourceFile: entry.file
+                    }));
                 }));
 
                 const builtInData = results.flat();
+                const previousBuiltInIDs = new Set(JSON.parse(localStorage.getItem(BUILTIN_IDS_KEY) || '[]'));
+                const currentBuiltInIDs = new Set();
+
+                // Remove old GitHub questions that are no longer present in the manifest.
+                // Non-GitHub/imported questions are preserved.
+                questionsDB = questionsDB.filter(q => !previousBuiltInIDs.has(q.id));
+
                 const existingByID = new Map(questionsDB.map((q, index) => [q.id, index]));
                 let added = 0;
-                let updated = 0;
 
-                builtInData.forEach(q => {
+                builtInData.forEach((q, index) => {
                     if (!q || !q.question || !Array.isArray(q.options)) return;
 
                     const copy = { ...q };
                     if (!copy.id) {
-                        copy.id = 'builtin_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8);
+                        copy.id = `builtin_${Date.now()}_${index}_${Math.random().toString(36).slice(2, 8)}`;
                     }
-                    if (!copy.section) copy.section = copy.category || 'General';
-                    if (!copy.category) copy.category = copy.section;
 
-                    // GitHub is the source of truth for built-in questions.
-                    // Replace an existing question with the same ID so edits made
-                    // on GitHub are reflected in the website.
+                    // Keep section/category names controlled by the manifest.
+                    copy.section = copy.section || copy.category || 'General';
+                    copy.category = copy.category || copy.section || 'General';
+                    currentBuiltInIDs.add(copy.id);
+
                     if (existingByID.has(copy.id)) {
                         questionsDB[existingByID.get(copy.id)] = copy;
-                        updated++;
                     } else {
                         existingByID.set(copy.id, questionsDB.length);
                         questionsDB.push(copy);
@@ -1350,14 +1373,14 @@
                     }
                 });
 
-                if (added > 0 || updated > 0) saveDatabase();
+                localStorage.setItem(BUILTIN_IDS_KEY, JSON.stringify([...currentBuiltInIDs]));
+                saveDatabase();
                 updateAllUIComponents();
 
-                console.log(`GitHub question bank loaded: ${builtInData.length} questions from ${files.length} files; ${added} added, ${updated} updated.`);
+                console.log(`GitHub question bank loaded: ${builtInData.length} questions from ${entries.length} files; ${added} new questions added.`);
             } catch (error) {
-                // Keep the app usable when the GitHub question bank is missing during local testing.
                 console.error('GitHub question bank could not be loaded:', error);
-                console.warn('Check that /questions/index.json and every listed JSON file are committed to the GitHub repository and deployed by Vercel.');
+                console.warn('Check /questions/index.json and every listed JSON file.');
             }
         }
 
