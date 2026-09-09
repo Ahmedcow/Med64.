@@ -1,0 +1,315 @@
+[
+  {
+    "id": "para3-001",
+    "category": "para3",
+    "section": "parasitology",
+    "question": "Which parasite causes cutaneous larva migrans?",
+    "options": [
+      "Wuchereria bancrofti",
+      "Ancylostoma braziliense",
+      "Loa loa",
+      "Schistosoma mansoni",
+      "Trichinella spiralis"
+    ],
+    "correctIndex": 1,
+    "explanation": "Ancylostoma braziliense causes cutaneous larva migrans."
+  },
+  {
+    "id": "para3-002",
+    "category": "para3",
+    "section": "parasitology",
+    "question": "What is another name for cutaneous larva migrans?",
+    "options": [
+      "River blindness",
+      "Ground itch",
+      "Creeping eruption",
+      "Swimmer’s itch",
+      "Calabar swelling"
+    ],
+    "correctIndex": 2,
+    "explanation": "Cutaneous larva migrans is also called creeping eruption."
+  },
+  {
+    "id": "para3-003",
+    "category": "para3",
+    "section": "parasitology",
+    "question": "The migrating rash of Strongyloides stercoralis is called:",
+    "options": [
+      "Urticaria",
+      "Tinea",
+      "Larva currens",
+      "Calabar swelling",
+      "Macule"
+    ],
+    "correctIndex": 2,
+    "explanation": "The rapidly migrating rash associated with Strongyloides stercoralis is called larva currens."
+  },
+  {
+    "id": "para3-004",
+    "category": "para3",
+    "section": "parasitology",
+    "question": "The intermediate host of Loa loa is:",
+    "options": [
+      "Cyclops",
+      "Culex mosquito",
+      "Chrysops fly",
+      "Tsetse fly",
+      "Anopheles mosquito"
+    ],
+    "correctIndex": 2,
+    "explanation": "The Chrysops fly is the intermediate host and vector of Loa loa."
+  },
+  {
+    "id": "para3-005",
+    "category": "para3",
+    "section": "parasitology",
+    "question": "The diagnostic stage of Loa loa is:",
+    "options": [
+      "Eggs in stool",
+      "Larva in CSF",
+      "Microfilariae in blood",
+      "Adult in urine",
+      "Cyst in tissue"
+    ],
+    "correctIndex": 2,
+    "explanation": "Loa loa is diagnosed by identifying microfilariae in the blood."
+  },
+  {
+    "id": "para3-006",
+    "category": "para3",
+    "section": "parasitology",
+    "question": "What lesion is typically caused by Loa loa?",
+    "options": [
+      "River blindness",
+      "Hanging groin",
+      "Calabar swelling",
+      "Keratitis",
+      "Elephantiasis"
+    ],
+    "correctIndex": 2,
+    "explanation": "Loa loa typically causes Calabar swelling."
+  },
+  {
+    "id": "para3-007",
+    "category": "para3",
+    "section": "parasitology",
+    "question": "Ocular migration across the conjunctiva is seen in:",
+    "options": [
+      "Onchocerca volvulus",
+      "Strongyloides stercoralis",
+      "Loa loa",
+      "Dracunculus medinensis",
+      "Wuchereria bancrofti"
+    ],
+    "correctIndex": 2,
+    "explanation": "Adult Loa loa worms can migrate across the conjunctiva of the eye."
+  },
+  {
+    "id": "para3-008",
+    "category": "para3",
+    "section": "parasitology",
+    "question": "Which test helps in the diagnosis of Loa loa infection?",
+    "options": [
+      "Skin snip",
+      "Blood smear",
+      "Urine test",
+      "ELISA only"
+    ],
+    "correctIndex": 1,
+    "explanation": "A blood smear helps identify Loa loa microfilariae."
+  },
+  {
+    "id": "para3-009",
+    "category": "para3",
+    "section": "parasitology",
+    "question": "The adult Onchocerca volvulus lives in:",
+    "options": [
+      "Liver",
+      "Skin nodules",
+      "Brain",
+      "Lymphatics",
+      "Retina"
+    ],
+    "correctIndex": 1,
+    "explanation": "Adult Onchocerca volvulus worms live in subcutaneous skin nodules."
+  },
+  {
+    "id": "para3-010",
+    "category": "para3",
+    "section": "parasitology",
+    "question": "The vector of Onchocerca volvulus is:",
+    "options": [
+      "Black fly (Simulium)",
+      "Sandfly",
+      "Tsetse fly",
+      "Mosquito",
+      "Flea"
+    ],
+    "correctIndex": 0,
+    "explanation": "Onchocerca volvulus is transmitted by the black fly of the genus Simulium."
+  },
+  {
+    "id": "para3-011",
+    "category": "para3",
+    "section": "parasitology",
+    "question": "Which parasite causes “hanging groin”?",
+    "options": [
+      "Wuchereria bancrofti",
+      "Loa loa",
+      "Onchocerca volvulus",
+      "Toxocara canis",
+      "Trichinella spiralis"
+    ],
+    "correctIndex": 2,
+    "explanation": "Onchocerca volvulus is associated with the characteristic finding called hanging groin."
+  },
+  {
+    "id": "para3-012",
+    "category": "para3",
+    "section": "parasitology",
+    "question": "Which of the following is a diagnostic method for onchocerciasis?",
+    "options": [
+      "Blood smear",
+      "CSF analysis",
+      "Skin snip",
+      "Sputum exam",
+      "ELISA only"
+    ],
+    "correctIndex": 2,
+    "explanation": "A skin snip is used to diagnose onchocerciasis by detecting microfilariae."
+  },
+  {
+    "id": "para3-013",
+    "category": "para3",
+    "section": "parasitology",
+    "question": "What is the Mazzotti reaction?",
+    "options": [
+      "Diagnostic skin rash",
+      "Drug hypersensitivity after treatment",
+      "Antigen detection test",
+      "Stool exam result"
+    ],
+    "correctIndex": 1,
+    "explanation": "The Mazzotti reaction is a drug-related hypersensitivity reaction occurring after treatment of onchocerciasis."
+  },
+  {
+    "id": "para3-014",
+    "category": "para3",
+    "section": "parasitology",
+    "question": "Dracunculus medinensis is transmitted by:",
+    "options": [
+      "Black fly",
+      "Mosquito",
+      "Cyclops (water flea)",
+      "Sandfly",
+      "Flea"
+    ],
+    "correctIndex": 2,
+    "explanation": "Dracunculus medinensis is transmitted through ingestion of infected Cyclops (water fleas)."
+  },
+  {
+    "id": "para3-015",
+    "category": "para3",
+    "section": "parasitology",
+    "question": "Adult Dracunculus medinensis is found in:",
+    "options": [
+      "Eye",
+      "Intestine",
+      "Skin and subcutaneous tissue",
+      "Lymph nodes",
+      "Liver"
+    ],
+    "correctIndex": 2,
+    "explanation": "Adult Dracunculus medinensis is found in the skin and subcutaneous tissue."
+  },
+  {
+    "id": "para3-016",
+    "category": "para3",
+    "section": "parasitology",
+    "question": "The main symptom of Dracunculus medinensis is:",
+    "options": [
+      "Headache",
+      "Skin ulcer",
+      "Diarrhea",
+      "Wheezing",
+      "Anemia"
+    ],
+    "correctIndex": 1,
+    "explanation": "The main symptom listed in the source is a skin ulcer."
+  },
+  {
+    "id": "para3-017",
+    "category": "para3",
+    "section": "parasitology",
+    "question": "The intermediate host of Dracunculus medinensis is:",
+    "options": [
+      "Chrysops",
+      "Sandfly",
+      "Mosquito",
+      "Cyclops",
+      "Snail"
+    ],
+    "correctIndex": 3,
+    "explanation": "Cyclops is the intermediate host of Dracunculus medinensis."
+  },
+  {
+    "id": "para3-018",
+    "category": "para3",
+    "section": "parasitology",
+    "question": "Diagnosis of Dracunculus medinensis includes:",
+    "options": [
+      "Liver biopsy",
+      "Stool examination",
+      "Microscopic identification of larva",
+      "PCR test",
+      "CSF exam"
+    ],
+    "correctIndex": 2,
+    "explanation": "Diagnosis includes microscopic identification of the larva."
+  },
+  {
+    "id": "para3-019",
+    "category": "para3",
+    "section": "parasitology",
+    "question": "The microfilariae of Loa loa show:",
+    "options": [
+      "No periodicity",
+      "No sheath",
+      "No nuclei",
+      "Diurnal periodicity",
+      "No detection in blood"
+    ],
+    "correctIndex": 3,
+    "explanation": "Loa loa microfilariae show diurnal periodicity."
+  },
+  {
+    "id": "para3-020",
+    "category": "para3",
+    "section": "parasitology",
+    "question": "The life cycle of Onchocerca volvulus includes:",
+    "options": [
+      "Human and mosquito",
+      "Human and Simulium fly",
+      "Human and snail",
+      "Human and flea",
+      "Human and cyclops"
+    ],
+    "correctIndex": 1,
+    "explanation": "The life cycle of Onchocerca volvulus involves humans and the Simulium black fly."
+  },
+  {
+    "id": "para3-021",
+    "category": "para3",
+    "section": "parasitology",
+    "question": "Prevention of Dracunculus medinensis involves:",
+    "options": [
+      "Killing mosquitoes",
+      "Cooking meat",
+      "Filtering drinking water",
+      "Wearing shoes",
+      "Vaccination"
+    ],
+    "correctIndex": 2,
+    "explanation": "Filtering drinking water helps prevent transmission of Dracunculus medinensis."
+  }
+]

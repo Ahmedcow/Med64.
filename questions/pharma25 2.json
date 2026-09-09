@@ -1,0 +1,593 @@
+[
+  {
+    "id": "pharma25-001",
+    "category": "pharma25",
+    "section": "pharmacology",
+    "question": "Which of the following increases the risk of bleeding when given with warfarin?",
+    "options": [
+      "Phenytoin",
+      "Aspirin",
+      "Furosemide",
+      "Vitamin K"
+    ],
+    "correctIndex": 1,
+    "explanation": "Aspirin increases bleeding risk when combined with warfarin."
+  },
+  {
+    "id": "pharma25-002",
+    "category": "pharma25",
+    "section": "pharmacology",
+    "question": "Which of the following drugs can increase lithium toxicity?",
+    "options": [
+      "Thiazide diuretics",
+      "Beta-blockers",
+      "Calcium channel blockers",
+      "Antacids"
+    ],
+    "correctIndex": 0,
+    "explanation": "Thiazide diuretics can reduce lithium clearance and increase lithium levels."
+  },
+  {
+    "id": "pharma25-003",
+    "category": "pharma25",
+    "section": "pharmacology",
+    "question": "A patient on theophylline develops toxicity after starting ciprofloxacin. The mechanism is:",
+    "options": [
+      "Increased renal excretion",
+      "Decreased hepatic metabolism",
+      "Increased protein binding",
+      "Displacement from receptors"
+    ],
+    "correctIndex": 1,
+    "explanation": "Ciprofloxacin decreases hepatic metabolism of theophylline, increasing its concentration."
+  },
+  {
+    "id": "pharma25-004",
+    "category": "pharma25",
+    "section": "pharmacology",
+    "question": "Which of the following drugs has a clearly narrow therapeutic index?",
+    "options": [
+      "Amitriptyline",
+      "Lithium",
+      "Oxybutynin",
+      "Codeine",
+      "Tramadol"
+    ],
+    "correctIndex": 1,
+    "explanation": "Lithium has a narrow therapeutic index, so small changes in concentration can cause toxicity."
+  },
+  {
+    "id": "pharma25-005",
+    "category": "pharma25",
+    "section": "pharmacology",
+    "question": "Which of the following statements about pharmacokinetic drug interactions is correct?",
+    "options": [
+      "Pharmacokinetic drug interactions primarily affect drug target interactions.",
+      "Pharmacokinetic drug interactions occur when two drugs compete for the same receptor.",
+      "Pharmacokinetic drug interactions can alter drug absorption, distribution, metabolism, or excretion.",
+      "Pharmacokinetic drug interactions only occur between drugs with similar chemical structures."
+    ],
+    "correctIndex": 2,
+    "explanation": "Pharmacokinetic interactions alter absorption, distribution, metabolism, or excretion of drugs."
+  },
+  {
+    "id": "pharma25-006",
+    "category": "pharma25",
+    "section": "pharmacology",
+    "question": "In vitro or in a syringe, the interaction between penicillin and an aminoglycoside is:",
+    "options": [
+      "Chemical antagonism",
+      "Synergism",
+      "Potentiation",
+      "Physical antagonism"
+    ],
+    "correctIndex": 0,
+    "explanation": "When mixed directly, penicillins can chemically inactivate aminoglycosides."
+  },
+  {
+    "id": "pharma25-007",
+    "category": "pharma25",
+    "section": "pharmacology",
+    "question": "In vivo, the interaction between penicillin and an aminoglycoside is:",
+    "options": [
+      "Chemical antagonism",
+      "Synergism",
+      "Potentiation",
+      "Physical antagonism"
+    ],
+    "correctIndex": 1,
+    "explanation": "In vivo, penicillins and aminoglycosides can produce a beneficial synergistic antibacterial effect."
+  },
+  {
+    "id": "pharma25-008",
+    "category": "pharma25",
+    "section": "pharmacology",
+    "question": "Which type of drug interaction is particularly hazardous with drugs like warfarin, digoxin, and lithium?",
+    "options": [
+      "Synergistic Effects",
+      "Antagonistic Effects",
+      "Narrow Therapeutic Index Effects",
+      "Receptor Effects",
+      "Additive Effects"
+    ],
+    "correctIndex": 2,
+    "explanation": "Drugs with a narrow therapeutic index have a small margin between therapeutic and toxic concentrations."
+  },
+  {
+    "id": "pharma25-009",
+    "category": "pharma25",
+    "section": "pharmacology",
+    "question": "The following is true for interactions between drugs:",
+    "options": [
+      "It is not harmful if it occurs between drugs having steep dose-response curves.",
+      "It is not harmful if it occurs between drugs having narrow therapeutic ratios.",
+      "It is not harmful if it occurs between drugs undergoing zero-order kinetics.",
+      "It may lead to valuable therapeutic effects.",
+      "It is described as addition if action of one drug abolishes the effect of another."
+    ],
+    "correctIndex": 3,
+    "explanation": "Drug interactions may be intentionally used to produce valuable therapeutic effects."
+  },
+  {
+    "id": "pharma25-010",
+    "category": "pharma25",
+    "section": "pharmacology",
+    "question": "A 58-year-old man on warfarin is started on rifampin for a mycobacterial infection. Two weeks later, he presents with a DVT. What is the most likely explanation?",
+    "options": [
+      "Rifampin inhibited the metabolism of warfarin",
+      "Rifampin displaced warfarin from plasma proteins",
+      "Rifampin induced the hepatic metabolism of warfarin",
+      "Rifampin increased the renal excretion of warfarin"
+    ],
+    "correctIndex": 2,
+    "explanation": "Rifampin induces hepatic drug-metabolizing enzymes, increasing warfarin metabolism and reducing its anticoagulant effect."
+  },
+  {
+    "id": "pharma25-011",
+    "category": "pharma25",
+    "section": "pharmacology",
+    "question": "Which of the following combinations is an example of a beneficial drug interaction used as an antidote?",
+    "options": [
+      "Trimethoprim and sulfamethoxazole",
+      "Furosemide and amiloride",
+      "Atropine and organophosphates",
+      "Penicillin and an aminoglycoside"
+    ],
+    "correctIndex": 2,
+    "explanation": "Atropine is used to counter muscarinic effects of organophosphate poisoning."
+  },
+  {
+    "id": "pharma25-012",
+    "category": "pharma25",
+    "section": "pharmacology",
+    "question": "A patient on digoxin requires a course of antibiotics and is given tetracycline. He soon develops signs of digoxin toxicity. Which mechanism best explains this interaction?",
+    "options": [
+      "Tetracycline chelates digoxin, increasing its absorption",
+      "Tetracycline alters gut flora, increasing digoxin absorption",
+      "Tetracycline displaces digoxin from tissue binding sites",
+      "Tetracycline inhibits P-glycoprotein in the kidney"
+    ],
+    "correctIndex": 1,
+    "explanation": "Tetracycline can alter gut flora, increasing the fraction of digoxin absorbed."
+  },
+  {
+    "id": "pharma25-013",
+    "category": "pharma25",
+    "section": "pharmacology",
+    "question": "A drug interaction that occurs when two drugs are mixed in an IV bag and form a precipitate is classified as:",
+    "options": [
+      "A pharmacodynamic interaction",
+      "A pharmacokinetic interaction",
+      "A pharmaceutical interaction",
+      "A drug-food interaction"
+    ],
+    "correctIndex": 2,
+    "explanation": "An incompatibility occurring before administration, such as precipitation in an IV bag, is a pharmaceutical interaction."
+  },
+  {
+    "id": "pharma25-014",
+    "category": "pharma25",
+    "section": "pharmacology",
+    "question": "A patient on lithium for bipolar disorder is prescribed a thiazide diuretic for hypertension. What is the primary concern with this combination?",
+    "options": [
+      "Thiazides increase lithium excretion, causing treatment failure",
+      "Thiazides cause plasma volume reduction, increasing lithium levels",
+      "Thiazides compete with lithium for tubular secretion",
+      "Thiazides alkalinize the urine, increasing lithium reabsorption"
+    ],
+    "correctIndex": 1,
+    "explanation": "Thiazide-induced volume depletion promotes renal lithium reabsorption and can raise lithium levels."
+  },
+  {
+    "id": "pharma25-015",
+    "category": "pharma25",
+    "section": "pharmacology",
+    "question": "Which of the following is an example of a beneficial synergistic drug interaction?",
+    "options": [
+      "Aspirin and warfarin",
+      "Alcohol and benzodiazepines",
+      "Penicillin and gentamicin",
+      "Cephalothin and gentamicin"
+    ],
+    "correctIndex": 2,
+    "explanation": "Penicillin and gentamicin can act synergistically against certain bacterial infections."
+  },
+  {
+    "id": "pharma25-016",
+    "category": "pharma25",
+    "section": "pharmacology",
+    "question": "Ketoconazole, an antifungal drug that requires an acidic environment for absorption, is given to a patient taking high-dose antacids. What is the expected outcome?",
+    "options": [
+      "Increased absorption of ketoconazole due to higher gastric pH",
+      "Decreased absorption of ketoconazole due to higher gastric pH",
+      "No change in ketoconazole absorption",
+      "Increased metabolism of ketoconazole by the liver"
+    ],
+    "correctIndex": 1,
+    "explanation": "Antacids raise gastric pH, reducing absorption of ketoconazole that requires an acidic environment."
+  },
+  {
+    "id": "pharma25-017",
+    "category": "pharma25",
+    "section": "pharmacology",
+    "question": "Verapamil is known to increase serum digoxin levels, leading to toxicity. The primary mechanism for this is:",
+    "options": [
+      "Inhibition of renal tubular secretion of digoxin",
+      "Displacement of digoxin from plasma proteins",
+      "Induction of P-glycoprotein in the gut",
+      "Displacement of digoxin from tissue binding sites"
+    ],
+    "correctIndex": 3,
+    "explanation": "The provided source identifies displacement of digoxin from tissue binding sites as the primary mechanism."
+  },
+  {
+    "id": "pharma25-018",
+    "category": "pharma25",
+    "section": "pharmacology",
+    "question": "A patient on an oral contraceptive pill is started on a broad-spectrum antibiotic and becomes pregnant. How can this be explained?",
+    "options": [
+      "The antibiotic induced the metabolism of the contraceptive pill",
+      "The antibiotic killed gut flora, reducing enterohepatic recirculation of the pill",
+      "The antibiotic inhibited the absorption of the pill",
+      "The antibiotic displaced the pill from its receptor"
+    ],
+    "correctIndex": 1,
+    "explanation": "Reduction of gut flora can reduce enterohepatic recirculation and lower contraceptive exposure."
+  },
+  {
+    "id": "pharma25-019",
+    "category": "pharma25",
+    "section": "pharmacology",
+    "question": "Probenecid is sometimes used to increase the duration of action of penicillin G. The mechanism for this beneficial interaction is:",
+    "options": [
+      "Inhibition of penicillin metabolism in the liver",
+      "Displacement of penicillin from plasma proteins",
+      "Inhibition of renal tubular secretion of penicillin",
+      "Reduction of the volume of distribution of penicillin"
+    ],
+    "correctIndex": 2,
+    "explanation": "Probenecid inhibits renal tubular secretion of penicillin, increasing and prolonging its plasma concentration."
+  },
+  {
+    "id": "pharma25-020",
+    "category": "pharma25",
+    "section": "pharmacology",
+    "question": "Which physiological change caused by thiazide diuretics increases the risk of digoxin toxicity?",
+    "options": [
+      "Hypercalcemia",
+      "Hyponatremia",
+      "Hypokalemia",
+      "Hyperkalemia"
+    ],
+    "correctIndex": 2,
+    "explanation": "Thiazide-induced hypokalemia increases susceptibility to digoxin toxicity."
+  },
+  {
+    "id": "pharma25-021",
+    "category": "pharma25",
+    "section": "pharmacology",
+    "question": "A patient is given sodium bicarbonate to alkalinize their urine after a drug overdose. For which type of drug would this be most effective?",
+    "options": [
+      "A weak base, like amphetamine",
+      "A weak acid, like aspirin",
+      "A neutral compound, like ethanol",
+      "A drug that is highly protein-bound"
+    ],
+    "correctIndex": 1,
+    "explanation": "Urinary alkalinization enhances ionization and excretion of weak acids such as aspirin."
+  },
+  {
+    "id": "pharma25-022",
+    "category": "pharma25",
+    "section": "pharmacology",
+    "question": "A patient consuming a diet rich in green leafy vegetables (high in vitamin K) while on warfarin is at risk for:",
+    "options": [
+      "Increased risk of bleeding",
+      "Decreased anticoagulant effect",
+      "No change in warfarin effect",
+      "Increased warfarin metabolism"
+    ],
+    "correctIndex": 1,
+    "explanation": "High vitamin K intake can reduce the anticoagulant effect of warfarin."
+  },
+  {
+    "id": "pharma25-023",
+    "category": "pharma25",
+    "section": "pharmacology",
+    "question": "Which drug is correctly paired with a characteristic that makes it a high-risk candidate for drug interactions?",
+    "options": [
+      "Penicillin: Narrow therapeutic index",
+      "Lithium: High plasma protein binding",
+      "Phenytoin: Zero-order kinetics",
+      "Metformin: Affects vital physiology"
+    ],
+    "correctIndex": 2,
+    "explanation": "Phenytoin can exhibit zero-order kinetics at therapeutic concentrations, making concentration changes clinically important."
+  },
+  {
+    "id": "pharma25-024",
+    "category": "pharma25",
+    "section": "pharmacology",
+    "question": "A patient receiving a local anesthetic for a minor procedure also receives epinephrine along with it. The purpose of the epinephrine is to:",
+    "options": [
+      "Increase the metabolism of the anesthetic",
+      "Decrease the absorption of the anesthetic via vasoconstriction",
+      "Prevent an allergic reaction to the anesthetic",
+      "Alkalinize the tissue to increase the active form of the anesthetic"
+    ],
+    "correctIndex": 1,
+    "explanation": "Epinephrine causes local vasoconstriction, reducing systemic absorption of the local anesthetic."
+  },
+  {
+    "id": "pharma25-025",
+    "category": "pharma25",
+    "section": "pharmacology",
+    "question": "A patient with a history of peptic ulcer disease takes ibuprofen (NSAID) for arthritis pain. This represents a:",
+    "options": [
+      "Drug-drug interaction",
+      "Drug-food interaction",
+      "Drug-disease interaction",
+      "Pharmaceutical interaction"
+    ],
+    "correctIndex": 2,
+    "explanation": "Ibuprofen can worsen an underlying peptic ulcer disease, making this a drug-disease interaction."
+  },
+  {
+    "id": "pharma25-026",
+    "category": "pharma25",
+    "section": "pharmacology",
+    "question": "Which of the following combinations would most likely result in a loss of therapeutic effect due to enzyme induction?",
+    "options": [
+      "Erythromycin and warfarin",
+      "Rifampin and oral contraceptives",
+      "Verapamil and digoxin",
+      "Probenecid and penicillin"
+    ],
+    "correctIndex": 1,
+    "explanation": "Rifampin induces drug-metabolizing enzymes and can reduce oral contraceptive effectiveness."
+  },
+  {
+    "id": "pharma25-027",
+    "category": "pharma25",
+    "section": "pharmacology",
+    "question": "The effect of alcohol to increase the sedative properties of a benzodiazepine, despite acting via different cellular mechanisms, is an example of:",
+    "options": [
+      "A receptor interaction",
+      "A physiological interaction",
+      "An interaction due to electrolyte imbalance",
+      "A pharmaceutical interaction"
+    ],
+    "correctIndex": 1,
+    "explanation": "Alcohol and benzodiazepines produce enhanced sedation through physiological effects at different sites."
+  },
+  {
+    "id": "pharma25-028",
+    "category": "pharma25",
+    "section": "pharmacology",
+    "question": "A patient taking tetracycline for acne is advised to avoid taking it with milk or dairy products. What is the primary concern?",
+    "options": [
+      "Milk increases the metabolism of tetracycline",
+      "Calcium in milk chelates tetracycline, forming an unabsorbable complex",
+      "Milk alkalinizes the stomach, destroying tetracycline",
+      "Milk induces liver enzymes that break down tetracycline"
+    ],
+    "correctIndex": 1,
+    "explanation": "Calcium can chelate tetracycline in the gut and reduce its absorption."
+  },
+  {
+    "id": "pharma25-029",
+    "category": "pharma25",
+    "section": "pharmacology",
+    "question": "Which statement best defines a pharmacodynamic drug interaction?",
+    "options": [
+      "A change in a drug's plasma level due to altered absorption",
+      "A physicochemical incompatibility when drugs are mixed",
+      "A change in a drug's effect without a change in its plasma concentration",
+      "An alteration in a drug's renal excretion"
+    ],
+    "correctIndex": 2,
+    "explanation": "Pharmacodynamic interactions change drug effects without necessarily changing plasma drug concentrations."
+  },
+  {
+    "id": "pharma25-030",
+    "category": "pharma25",
+    "section": "pharmacology",
+    "question": "A patient on a beta-blocker for hypertension uses a salbutamol inhaler for asthma and finds it is not effective. This is likely due to:",
+    "options": [
+      "A physiological interaction at different receptors",
+      "A receptor interaction where beta-blockers block the receptor for salbutamol",
+      "Increased metabolism of salbutamol by the beta-blocker",
+      "Decreased absorption of salbutamol from the lungs"
+    ],
+    "correctIndex": 1,
+    "explanation": "Beta-blockers can antagonize beta-adrenergic receptors targeted by salbutamol."
+  },
+  {
+    "id": "pharma25-031",
+    "category": "pharma25",
+    "section": "pharmacology",
+    "question": "Administration of a broad-spectrum antibiotic to a patient on digoxin can lead to digoxin toxicity. What is the mechanism?",
+    "options": [
+      "Antibiotics inhibit CYP450 enzymes in the liver",
+      "Antibiotics alter the gut flora, increasing the fraction of digoxin absorbed",
+      "Antibiotics decrease the renal clearance of digoxin",
+      "Antibiotics displace digoxin from its binding site on Na/K ATPase"
+    ],
+    "correctIndex": 1,
+    "explanation": "Broad-spectrum antibiotics can alter gut flora and increase the fraction of digoxin absorbed."
+  },
+  {
+    "id": "pharma25-032",
+    "category": "pharma25",
+    "section": "pharmacology",
+    "question": "Which drug is most likely to have its absorption reduced by the concomitant administration of cholestyramine?",
+    "options": [
+      "Lithium",
+      "Levothyroxine",
+      "Penicillin",
+      "Furosemide"
+    ],
+    "correctIndex": 1,
+    "explanation": "Cholestyramine can bind drugs in the gastrointestinal tract and reduce absorption of levothyroxine."
+  },
+  {
+    "id": "pharma25-033",
+    "category": "pharma25",
+    "section": "pharmacology",
+    "question": "Naloxone is used to reverse the effects of a morphine overdose. This is a classic example of an interaction at the level of:",
+    "options": [
+      "Drug metabolism",
+      "Drug excretion",
+      "The drug receptor",
+      "Physiological systems"
+    ],
+    "correctIndex": 2,
+    "explanation": "Naloxone reverses morphine by competitively antagonizing opioid receptors."
+  },
+  {
+    "id": "pharma25-034",
+    "category": "pharma25",
+    "section": "pharmacology",
+    "question": "A patient on an anticoagulant is also taking large amounts of garlic as a supplement. What is a potential risk?",
+    "options": [
+      "Increased blood pressure",
+      "Decreased anticoagulant effect",
+      "Enhanced anticoagulant effect and bleeding risk",
+      "Increased metabolism of the anticoagulant"
+    ],
+    "correctIndex": 2,
+    "explanation": "Large amounts of garlic may enhance anticoagulant effects and increase bleeding risk."
+  },
+  {
+    "id": "pharma25-035",
+    "category": "pharma25",
+    "section": "pharmacology",
+    "question": "A thyrotoxic patient is given a sympathomimetic drug. What is the anticipated effect?",
+    "options": [
+      "Decreased response due to receptor downregulation",
+      "Increased response due to sensitization of adrenergic receptors",
+      "No change in the expected response",
+      "Increased metabolism of the sympathomimetic"
+    ],
+    "correctIndex": 1,
+    "explanation": "Thyrotoxicosis can increase sensitivity to sympathomimetic effects."
+  },
+  {
+    "id": "pharma25-036",
+    "category": "pharma25",
+    "section": "pharmacology",
+    "question": "A patient is taking furosemide and an NSAID for arthritis. The NSAID may reduce the diuretic effect of furosemide by:",
+    "options": [
+      "Competing for tubular secretion",
+      "Inhibiting prostaglandin synthesis, reducing renal blood flow",
+      "Alkalinizing the urine and trapping furosemide",
+      "Inducing the metabolism of furosemide"
+    ],
+    "correctIndex": 1,
+    "explanation": "NSAID inhibition of prostaglandin synthesis can reduce renal blood flow and diminish the diuretic response."
+  },
+  {
+    "id": "pharma25-037",
+    "category": "pharma25",
+    "section": "pharmacology",
+    "question": "Combining an aminoglycoside antibiotic with cephalosporin is hazardous primarily because it may lead to:",
+    "options": [
+      "Increased risk of ototoxicity",
+      "Increased risk of nephrotoxicity",
+      "Increased risk of bleeding",
+      "Loss of antibiotic effect"
+    ],
+    "correctIndex": 1,
+    "explanation": "The combination can increase the risk of nephrotoxicity."
+  },
+  {
+    "id": "pharma25-038",
+    "category": "pharma25",
+    "section": "pharmacology",
+    "question": "A patient on lithium is placed on a low-salt diet. What effect might this have on lithium levels?",
+    "options": [
+      "Decreased lithium levels due to increased excretion",
+      "Increased lithium levels as the kidney reabsorbs more lithium with sodium",
+      "No change in lithium levels",
+      "Decreased absorption of lithium from the gut"
+    ],
+    "correctIndex": 1,
+    "explanation": "Reduced sodium intake can increase renal lithium reabsorption and raise lithium levels."
+  },
+  {
+    "id": "pharma25-039",
+    "category": "pharma25",
+    "section": "pharmacology",
+    "question": "Which of the following is a drug with high plasma protein binding capacity, making it susceptible to displacement interactions?",
+    "options": [
+      "Metformin",
+      "Lithium",
+      "Warfarin",
+      "Ampicillin"
+    ],
+    "correctIndex": 2,
+    "explanation": "Warfarin is highly plasma-protein bound and can be involved in displacement interactions."
+  },
+  {
+    "id": "pharma25-040",
+    "category": "pharma25",
+    "section": "pharmacology",
+    "question": "The combination of an ACE inhibitor and a diuretic is often used in hypertension. This is an example of:",
+    "options": [
+      "A hazardous interaction to be avoided",
+      "A pharmaceutical incompatibility",
+      "A beneficial therapeutic synergism",
+      "A drug-disease interaction"
+    ],
+    "correctIndex": 2,
+    "explanation": "ACE inhibitors and diuretics can provide beneficial complementary antihypertensive effects."
+  },
+  {
+    "id": "pharma25-041",
+    "category": "pharma25",
+    "section": "pharmacology",
+    "question": "To minimize the risk of a chelation interaction between ciprofloxacin and an antacid containing aluminum, the best advice for a patient is to:",
+    "options": [
+      "Take them both at the same time with a full glass of water",
+      "Stop taking the antacid completely",
+      "Separate the doses by at least 2 hours",
+      "Take a higher dose of ciprofloxacin"
+    ],
+    "correctIndex": 2,
+    "explanation": "Separating administration reduces the chance of aluminum chelating ciprofloxacin and reducing its absorption."
+  },
+  {
+    "id": "pharma25-042",
+    "category": "pharma25",
+    "section": "pharmacology",
+    "question": "Erythromycin administered to a patient stabilized on warfarin can lead to an increased INR and risk of bleeding. The primary mechanism is:",
+    "options": [
+      "Enzyme induction by erythromycin",
+      "Displacement of warfarin from protein binding",
+      "Enzyme inhibition by erythromycin, decreasing warfarin metabolism",
+      "Increased absorption of warfarin"
+    ],
+    "correctIndex": 2,
+    "explanation": "Erythromycin can inhibit warfarin metabolism, increasing warfarin exposure and INR."
+  }
+]
