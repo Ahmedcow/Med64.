@@ -10,6 +10,10 @@
       "section": "Pharmacology"
     },
     {
+      "file": "para3.json",
+      "section": "parasitology"
+    },
+    {
       "file": "anatomy.json",
       "section": "Anatomy"
     }
