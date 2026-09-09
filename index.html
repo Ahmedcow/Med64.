@@ -1304,6 +1304,14 @@
         // Example:
         // { "file": "lecture1.json", "section": "Cardiology", "category": "Heart Failure" }
         // Multiple files may use the same section.
+        // Stable unique key for each question. Built-in/GitHub questions use their source file + id,
+        // so identical IDs in different JSON files never collide. Imported/local questions use their id.
+        function getQuestionKey(q) {
+            if (!q) return '';
+            if (q._med64Builtin && q._med64SourceFile) return `github:${q._med64SourceFile}::${q.id}`;
+            return `local:${q.id}`;
+        }
+
         async function loadBuiltInQuestions() {
             const BUILTIN_IDS_KEY = 'med64_builtin_question_ids';
             try {
@@ -1346,9 +1354,12 @@
 
                 // Remove old GitHub questions that are no longer present in the manifest.
                 // Non-GitHub/imported questions are preserved.
-                questionsDB = questionsDB.filter(q => !previousBuiltInIDs.has(q.id));
+                questionsDB = questionsDB.filter(q => {
+                    const key = getQuestionKey(q);
+                    return !q._med64Builtin && !previousBuiltInIDs.has(key) && !previousBuiltInIDs.has(q.id);
+                });
 
-                const existingByID = new Map(questionsDB.map((q, index) => [q.id, index]));
+                const existingByKey = new Map(questionsDB.map((q, index) => [getQuestionKey(q), index]));
                 let added = 0;
 
                 builtInData.forEach((q, index) => {
@@ -1362,12 +1373,13 @@
                     // Keep section/category names controlled by the manifest.
                     copy.section = copy.section || copy.category || 'General';
                     copy.category = copy.category || copy.section || 'General';
-                    currentBuiltInIDs.add(copy.id);
+                    const questionKey = getQuestionKey(copy);
+                    currentBuiltInIDs.add(questionKey);
 
-                    if (existingByID.has(copy.id)) {
-                        questionsDB[existingByID.get(copy.id)] = copy;
+                    if (existingByKey.has(questionKey)) {
+                        questionsDB[existingByKey.get(questionKey)] = copy;
                     } else {
-                        existingByID.set(copy.id, questionsDB.length);
+                        existingByKey.set(questionKey, questionsDB.length);
                         questionsDB.push(copy);
                         added++;
                     }
@@ -1543,7 +1555,7 @@
             }
 
             if (mode === 'wrong') {
-                pool = pool.filter(q => wrongQuestionsIDs.has(q.id));
+                pool = pool.filter(q => wrongQuestionsIDs.has(getQuestionKey(q)));
             }
 
             if (pool.length === 0) {
@@ -1622,23 +1634,23 @@
         function selectOption(selectedIndex, correctIndex) {
             const cards = document.querySelectorAll('.option-card');
             const currentQ = currentExamPool[currentQIndex];
-            if (currentExamAnswers[currentQ.id]) return;
+            if (currentExamAnswers[getQuestionKey(currentQ)]) return;
 
-            currentExamAnswers[currentQ.id] = { selectedIndex, correctIndex };
+            currentExamAnswers[getQuestionKey(currentQ)] = { selectedIndex, correctIndex };
             cards.forEach(c => c.classList.add('disabled'));
 
             const isCorrect = selectedIndex === correctIndex;
             if (isCorrect) {
                 score++;
-                wrongQuestionsIDs.delete(currentQ.id);
+                wrongQuestionsIDs.delete(getQuestionKey(currentQ));
             } else {
-                wrongQuestionsIDs.add(currentQ.id);
+                wrongQuestionsIDs.add(getQuestionKey(currentQ));
             }
 
             // Record long-term progress per question.
-            if (!progressDB[currentQ.id]) progressDB[currentQ.id] = { attempts: 0, correct: 0 };
-            progressDB[currentQ.id].attempts++;
-            if (isCorrect) progressDB[currentQ.id].correct++;
+            if (!progressDB[getQuestionKey(currentQ)]) progressDB[getQuestionKey(currentQ)] = { attempts: 0, correct: 0 };
+            progressDB[getQuestionKey(currentQ)].attempts++;
+            if (isCorrect) progressDB[getQuestionKey(currentQ)].correct++;
 
             if (currentAnswerMode === 'immediate') {
                 cards[selectedIndex].classList.add(isCorrect ? 'correct' : 'incorrect');
@@ -1686,7 +1698,7 @@
                 list.className = 'review-list';
 
                 currentExamPool.forEach((q, index) => {
-                    const answer = currentExamAnswers[q.id];
+                    const answer = currentExamAnswers[getQuestionKey(q)];
                     const selected = answer ? q.options[answer.selectedIndex] : 'Not answered';
                     const correct = q.options[q.correctIndex];
                     const isCorrect = answer && answer.selectedIndex === q.correctIndex;
@@ -1715,9 +1727,9 @@
 
         function getProgressStats() {
             const total = questionsDB.length;
-            const answered = questionsDB.filter(q => (progressDB[q.id]?.attempts || 0) > 0).length;
-            const correct = questionsDB.reduce((sum, q) => sum + (progressDB[q.id]?.correct || 0), 0);
-            const attempts = questionsDB.reduce((sum, q) => sum + (progressDB[q.id]?.attempts || 0), 0);
+            const answered = questionsDB.filter(q => (progressDB[getQuestionKey(q)]?.attempts || 0) > 0).length;
+            const correct = questionsDB.reduce((sum, q) => sum + (progressDB[getQuestionKey(q)]?.correct || 0), 0);
+            const attempts = questionsDB.reduce((sum, q) => sum + (progressDB[getQuestionKey(q)]?.attempts || 0), 0);
             return {
                 total,
                 answered,
@@ -1754,10 +1766,10 @@
                 html += '<div class="progress-sections">';
                 [...sectionMap.entries()].sort((a,b) => a[0].localeCompare(b[0])).forEach(([section, catMap], sectionIndex) => {
                     const qs = [...catMap.values()].flat();
-                    const answered = qs.filter(q => (progressDB[q.id]?.attempts || 0) > 0).length;
+                    const answered = qs.filter(q => (progressDB[getQuestionKey(q)]?.attempts || 0) > 0).length;
                     const completion = qs.length ? Math.round(answered / qs.length * 100) : 0;
-                    const attempts = qs.reduce((n,q) => n + (progressDB[q.id]?.attempts || 0), 0);
-                    const correct = qs.reduce((n,q) => n + (progressDB[q.id]?.correct || 0), 0);
+                    const attempts = qs.reduce((n,q) => n + (progressDB[getQuestionKey(q)]?.attempts || 0), 0);
+                    const correct = qs.reduce((n,q) => n + (progressDB[getQuestionKey(q)]?.correct || 0), 0);
                     const accuracy = attempts ? Math.round(correct / attempts * 100) : 0;
                     html += `<details class="progress-section" ${compact ? '' : (sectionIndex === 0 ? 'open' : '')}>
                         <summary>
@@ -1769,9 +1781,9 @@
                         <div class="progress-section-body">
                             <div class="progress-bar"><span style="width:${completion}%"></span></div>`;
                     [...catMap.entries()].sort((a,b) => a[0].localeCompare(b[0])).forEach(([category, catQs]) => {
-                        const cAnswered = catQs.filter(q => (progressDB[q.id]?.attempts || 0) > 0).length;
-                        const cAttempts = catQs.reduce((n,q) => n + (progressDB[q.id]?.attempts || 0), 0);
-                        const cCorrect = catQs.reduce((n,q) => n + (progressDB[q.id]?.correct || 0), 0);
+                        const cAnswered = catQs.filter(q => (progressDB[getQuestionKey(q)]?.attempts || 0) > 0).length;
+                        const cAttempts = catQs.reduce((n,q) => n + (progressDB[getQuestionKey(q)]?.attempts || 0), 0);
+                        const cCorrect = catQs.reduce((n,q) => n + (progressDB[getQuestionKey(q)]?.correct || 0), 0);
                         const cAccuracy = cAttempts ? Math.round(cCorrect / cAttempts * 100) : 0;
                         const cCompletion = catQs.length ? Math.round(cAnswered / catQs.length * 100) : 0;
                         html += `<div class="progress-category-row">
@@ -1800,7 +1812,7 @@
                     <div class="progress-bar"><span style="width:${stats.completion}%"></span></div>
                     ${topSections.map(([section, catMap]) => {
                         const qs=[...catMap.values()].flat();
-                        const done=qs.filter(q => (progressDB[q.id]?.attempts || 0)>0).length;
+                        const done=qs.filter(q => (progressDB[getQuestionKey(q)]?.attempts || 0)>0).length;
                         const pct=qs.length ? Math.round(done/qs.length*100) : 0;
                         return `<div class="sidebar-progress-item"><div><span>${escapeHTML(section)}</span><span>${pct}%</span></div><div class="progress-bar"><span style="width:${pct}%"></span></div></div>`;
                     }).join('')}
