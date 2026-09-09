@@ -1,0 +1,16 @@
+[
+  {
+    "id": "q1",
+    "category": "Cardiology",
+    "section": "Cardiology",
+    "question": "Which of the following cardiac biomarkers is considered most specific for myocardial infarction?",
+    "options": [
+      "CK-MB",
+      "Troponin I",
+      "Myoglobin",
+      "LDH-1"
+    ],
+    "correctIndex": 1,
+    "explanation": "Cardiac Troponins (I and T) exhibit key high cardiac specificity and remain elevated for up to 10-14 days post-MI."
+  }
+]

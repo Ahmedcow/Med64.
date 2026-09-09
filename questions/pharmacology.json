@@ -1,0 +1,16 @@
+[
+  {
+    "id": "q2",
+    "category": "Pharmacology",
+    "section": "Pharmacology",
+    "question": "Which drug class is recommended as first-line antihypertensive therapy in patients with diabetic nephropathy?",
+    "options": [
+      "Beta Blockers",
+      "ACE Inhibitors",
+      "Loop Diuretics",
+      "Dihydropyridine CCBs"
+    ],
+    "correctIndex": 1,
+    "explanation": "ACE inhibitors dilate the efferent arteriole, reducing intraglomerular pressure and slowing proteinuria progression."
+  }
+]
