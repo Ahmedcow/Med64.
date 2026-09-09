@@ -14,17 +14,18 @@
     {
       "file": "pharmacology.json",
       "section": "Medicine",
-      "category": "Pharmacology1"
+      "category": "Pharmacology"
     },
     {
-      "file": "pharma25.json",
+      "file": "pharma25 2.json",
       "section": "pharmacology",
       "category": "pharma25"
     },
     {
-      "file": "para3.json",
+      "file": "para3_updated.json",
       "section": "parasitology",
       "category": "para3"
+    {
       
   ]
 }
