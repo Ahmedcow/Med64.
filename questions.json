@@ -1,0 +1,44 @@
+[
+  {
+    "id": "q1",
+    "category": "Cardiology",
+    "section": "Cardiology",
+    "question": "Which of the following cardiac biomarkers is considered most specific for myocardial infarction?",
+    "options": [
+      "CK-MB",
+      "Troponin I",
+      "Myoglobin",
+      "LDH-1"
+    ],
+    "correctIndex": 1,
+    "explanation": "Cardiac Troponins (I and T) exhibit key high cardiac specificity and remain elevated for up to 10-14 days post-MI."
+  },
+  {
+    "id": "q2",
+    "category": "Pharmacology",
+    "section": "Pharmacology",
+    "question": "Which drug class is recommended as first-line antihypertensive therapy in patients with diabetic nephropathy?",
+    "options": [
+      "Beta Blockers",
+      "ACE Inhibitors",
+      "Loop Diuretics",
+      "Dihydropyridine CCBs"
+    ],
+    "correctIndex": 1,
+    "explanation": "ACE inhibitors dilate the efferent arteriole, reducing intraglomerular pressure and slowing proteinuria progression."
+  },
+  {
+    "id": "q3",
+    "category": "Anatomy",
+    "section": "Anatomy",
+    "question": "Which nerve travels directly through the carpal tunnel beneath the flexor retinaculum?",
+    "options": [
+      "Ulnar Nerve",
+      "Radial Nerve",
+      "Median Nerve",
+      "Musculocutaneous Nerve"
+    ],
+    "correctIndex": 2,
+    "explanation": "The median nerve passes through the carpal tunnel alongside 9 flexor tendons."
+  }
+]

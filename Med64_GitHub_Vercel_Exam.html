@@ -1,0 +1,1634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Med 64 - Advanced Medical Examination Platform</title>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0284c7;
+            --primary-light: rgba(2, 132, 199, 0.12);
+            --primary-dark: #0369a1;
+            --accent: #6366f1;
+            --accent-light: rgba(99, 102, 241, 0.12);
+            --bg-main: #f8fafc;
+            --sidebar-bg: #ffffff;
+            --card-bg: #ffffff;
+            --text-title: #0f172a;
+            --text-body: #334155;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --success: #10b981;
+            --success-light: rgba(16, 185, 129, 0.12);
+            --danger: #ef4444;
+            --danger-light: rgba(239, 68, 68, 0.12);
+            --warning: #f59e0b;
+            --radius-lg: 20px;
+            --radius-md: 14px;
+            --radius-sm: 8px;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
+            --shadow-md: 0 10px 25px -5px rgba(0,0,0,0.05), 0 8px 10px -6px rgba(0,0,0,0.01);
+            --shadow-lg: 0 20px 30px -10px rgba(2, 132, 199, 0.08);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --glass: rgba(255, 255, 255, 0.85);
+            --glass-border: rgba(255, 255, 255, 0.5);
+        }
+
+        /* Dark Theme Variables */
+        body.dark-theme {
+            --bg-main: #0b0f19;
+            --sidebar-bg: #111827;
+            --card-bg: #111827;
+            --text-title: #f8fafc;
+            --text-body: #cbd5e1;
+            --text-muted: #94a3b8;
+            --border-color: #1e293b;
+            --primary-light: rgba(2, 132, 199, 0.2);
+            --accent-light: rgba(99, 102, 241, 0.2);
+            --success-light: rgba(16, 185, 129, 0.2);
+            --danger-light: rgba(239, 68, 68, 0.2);
+            --glass: rgba(17, 24, 39, 0.85);
+            --glass-border: rgba(255, 255, 255, 0.05);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-body);
+            display: flex;
+            min-height: 100vh;
+            overflow-x: hidden;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        /* Overlay for Mobile Sidebar */
+        .sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(15, 23, 42, 0.5);
+            backdrop-filter: blur(4px);
+            z-index: 999;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+        }
+
+        .sidebar-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Modern Sidebar Styling */
+        aside.sidebar {
+            width: 280px;
+            background-color: var(--sidebar-bg);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            z-index: 1000;
+            transition: var(--transition);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .sidebar-brand {
+            padding: 1.75rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.85rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .brand-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: var(--radius-md);
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.35rem;
+            box-shadow: 0 8px 16px rgba(2, 132, 199, 0.3);
+        }
+
+        .brand-text {
+            font-size: 1.35rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            color: var(--text-title);
+        }
+
+        .brand-badge {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white;
+            font-size: 0.65rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 6px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .sidebar-menu {
+            padding: 1.5rem 1rem;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+            overflow-y: auto;
+        }
+
+        .menu-label {
+            font-size: 0.725rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            padding: 0.85rem 0.75rem 0.35rem 0.75rem;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 0.85rem;
+            padding: 0.85rem 1rem;
+            border-radius: var(--radius-md);
+            color: var(--text-muted);
+            font-weight: 600;
+            font-size: 0.95rem;
+            text-decoration: none;
+            cursor: pointer;
+            transition: var(--transition);
+            border: 1px solid transparent;
+        }
+
+        .nav-item i {
+            font-size: 1.15rem;
+            width: 22px;
+            text-align: center;
+            transition: var(--transition);
+        }
+
+        .nav-item:hover {
+            background-color: var(--primary-light);
+            color: var(--primary);
+            transform: translateX(3px);
+        }
+
+        .nav-item.active {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            box-shadow: 0 8px 20px rgba(2, 132, 199, 0.3);
+        }
+
+        .nav-item.active i {
+            color: white;
+        }
+
+        .nav-item .badge {
+            margin-left: auto;
+            background: rgba(255, 255, 255, 0.25);
+            color: inherit;
+            padding: 0.15rem 0.6rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        .nav-item:not(.active) .badge {
+            background: var(--border-color);
+            color: var(--text-muted);
+        }
+
+        .sidebar-footer {
+            padding: 1.25rem 1.5rem;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .theme-toggle-btn {
+            background: var(--bg-main);
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+            font-size: 1.1rem;
+        }
+
+        .theme-toggle-btn:hover {
+            color: var(--primary);
+            border-color: var(--primary);
+            transform: rotate(15deg);
+        }
+
+        /* App Layout Container */
+        .app-container {
+            margin-left: 280px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            width: calc(100% - 280px);
+            transition: var(--transition);
+        }
+
+        /* Glassmorphic Top Header */
+        header.top-navbar {
+            height: 76px;
+            background-color: var(--glass);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 900;
+        }
+
+        .mobile-toggle {
+            display: none;
+            background: var(--bg-main);
+            border: 1px solid var(--border-color);
+            width: 42px;
+            height: 42px;
+            border-radius: var(--radius-md);
+            font-size: 1.2rem;
+            color: var(--text-title);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .mobile-toggle:hover {
+            color: var(--primary);
+            border-color: var(--primary);
+        }
+
+        .header-title {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: var(--text-title);
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+        }
+
+        .header-stats {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .stat-chip {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            padding: 0.5rem 1rem;
+            border-radius: 30px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .stat-chip i { font-size: 1rem; }
+        .stat-chip.total i { color: var(--primary); }
+        .stat-chip.wrong i { color: var(--danger); }
+
+        /* Main Content Container */
+        main.main-content {
+            padding: 2.5rem;
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+            flex: 1;
+        }
+
+        /* Enhanced Glass Cards & Visual UI */
+        .card {
+            background: var(--card-bg);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-md);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            transition: var(--transition);
+        }
+
+        .card:hover {
+            box-shadow: var(--shadow-lg);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.75rem;
+        }
+
+        .card-title {
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: var(--text-title);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .card-title i {
+            color: var(--primary);
+            background: var(--primary-light);
+            padding: 0.5rem;
+            border-radius: var(--radius-sm);
+        }
+
+        /* Upgraded Upload Dropzone */
+        .upload-dropzone {
+            border: 2px dashed var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 3.5rem 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+            background: var(--bg-main);
+            position: relative;
+        }
+
+        .upload-dropzone:hover, .upload-dropzone.dragover {
+            border-color: var(--primary);
+            background: var(--primary-light);
+            transform: scale(1.005);
+        }
+
+        .upload-icon {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-light), var(--accent-light));
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            margin: 0 auto 1.25rem auto;
+            box-shadow: 0 8px 20px rgba(2, 132, 199, 0.15);
+            transition: var(--transition);
+        }
+
+        .upload-dropzone:hover .upload-icon {
+            transform: translateY(-4px) scale(1.05);
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white;
+        }
+
+        /* Form Controls */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 1.75rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+        }
+
+        label {
+            font-weight: 700;
+            font-size: 0.875rem;
+            color: var(--text-title);
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        select, input[type="number"], input[type="text"] {
+            width: 100%;
+            padding: 0.9rem 1.1rem;
+            border: 1.5px solid var(--border-color);
+            border-radius: var(--radius-md);
+            background-color: var(--bg-main);
+            color: var(--text-title);
+            font-size: 0.95rem;
+            font-weight: 600;
+            outline: none;
+            transition: var(--transition);
+        }
+
+        select:focus, input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px var(--primary-light);
+            background-color: var(--card-bg);
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            padding: 0.95rem 1.8rem;
+            border-radius: var(--radius-md);
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            border: none;
+            transition: var(--transition);
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            box-shadow: 0 6px 18px rgba(2, 132, 199, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 24px rgba(2, 132, 199, 0.4);
+        }
+
+        .btn-secondary {
+            background: var(--bg-main);
+            color: var(--text-title);
+            border: 1.5px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background: var(--border-color);
+            transform: translateY(-1px);
+        }
+
+        .btn-danger {
+            background: var(--danger-light);
+            color: var(--danger);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+        .btn-danger:hover {
+            background: var(--danger);
+            color: white;
+            transform: translateY(-1px);
+        }
+
+        .btn-full { width: 100%; }
+
+        /* Interactive Quiz Screen */
+        .quiz-top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 1.25rem;
+            margin-bottom: 1.75rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .category-pill {
+            padding: 0.45rem 1rem;
+            border-radius: 30px;
+            background: var(--primary-light);
+            color: var(--primary);
+            font-size: 0.85rem;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .progress-text {
+            font-weight: 800;
+            font-size: 0.95rem;
+            color: var(--text-muted);
+        }
+
+        .question-box {
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: var(--text-title);
+            line-height: 1.55;
+            margin-bottom: 2rem;
+        }
+
+        .options-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .option-card {
+            padding: 1.25rem 1.5rem;
+            border-radius: var(--radius-md);
+            border: 1.5px solid var(--border-color);
+            background: var(--bg-main);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: var(--transition);
+            font-size: 1.025rem;
+            font-weight: 600;
+        }
+
+        .option-card:hover:not(.disabled) {
+            border-color: var(--primary);
+            background-color: var(--primary-light);
+            transform: translateX(6px);
+        }
+
+        .option-card.correct {
+            background-color: var(--success-light) !important;
+            border-color: var(--success) !important;
+            color: #047857;
+            font-weight: 800;
+        }
+
+        .option-card.incorrect {
+            background-color: var(--danger-light) !important;
+            border-color: var(--danger) !important;
+            color: #b91c1c;
+            font-weight: 800;
+        }
+
+        .option-card.disabled { cursor: default; }
+
+        .explanation-card {
+            background: var(--accent-light);
+            border-left: 4px solid var(--accent);
+            border-radius: 0 var(--radius-md) var(--radius-md) 0;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            font-size: 0.975rem;
+            line-height: 1.65;
+            color: var(--text-title);
+        }
+
+        .explanation-card strong {
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+            font-size: 1.05rem;
+        }
+
+        /* Category Cards Grid */
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 1.25rem;
+        }
+
+        .category-card {
+            background: var(--bg-main);
+            border: 1.5px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 1.5rem;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+        }
+
+        .category-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md);
+            background: var(--card-bg);
+        }
+
+        .category-card h4 {
+            font-size: 1.05rem;
+            font-weight: 800;
+            color: var(--text-title);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .category-card p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        /* Score Dial Results */
+        .result-box {
+            text-align: center;
+            padding: 3rem 1.5rem;
+        }
+
+        .score-dial {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-light), var(--accent-light));
+            border: 6px solid var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.75rem auto;
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--primary);
+            box-shadow: 0 10px 25px rgba(2, 132, 199, 0.2);
+        }
+
+
+        /* Section + timed exam enhancements */
+        .exam-timer {
+            padding: 0.5rem 1rem;
+            border-radius: 30px;
+            background: var(--danger-light);
+            color: var(--danger);
+            font-weight: 800;
+            min-width: 105px;
+            text-align: center;
+            font-variant-numeric: tabular-nums;
+        }
+        .exam-timer.warning { animation: timerPulse 1s infinite; }
+        @keyframes timerPulse {
+            50% { transform: scale(1.04); opacity: 0.72; }
+        }
+        .helper-text {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            line-height: 1.45;
+        }
+        .upload-meta {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: var(--radius-md);
+            background: var(--primary-light);
+            color: var(--text-body);
+            display: none;
+        }
+        .section-summary {
+            margin-top: 1rem;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .hidden { display: none !important; }
+
+        /* Mobile Breakpoints & Responsive Drawer */
+        @media (max-width: 992px) {
+            aside.sidebar {
+                transform: translateX(-100%);
+            }
+
+            aside.sidebar.active {
+                transform: translateX(0);
+            }
+
+            .app-container {
+                margin-left: 0;
+                width: 100%;
+            }
+
+            .mobile-toggle {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            header.top-navbar {
+                padding: 0 1.25rem;
+            }
+
+            main.main-content {
+                padding: 1.25rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Overlay Backdrop for Mobile Navigation -->
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+            <div class="brand-icon">
+                <i class="fa-solid fa-heart-pulse"></i>
+            </div>
+            <div>
+                <div class="brand-text">Med 64 <span class="brand-badge">PRO</span></div>
+            </div>
+        </div>
+
+        <nav class="sidebar-menu">
+            <div class="menu-label">Core Engine</div>
+            <a class="nav-item active" data-view="dashboard">
+                <i class="fa-solid fa-house"></i>
+                <span>Dashboard</span>
+            </a>
+            <a class="nav-item" data-view="categories">
+                <i class="fa-solid fa-layer-group"></i>
+                <span>Categories</span>
+                <span class="badge" id="side-cat-count">0</span>
+            </a>
+
+            <div class="menu-label">Exams & Revision</div>
+            <a class="nav-item" data-view="custom-test">
+                <i class="fa-solid fa-sliders"></i>
+                <span>Custom Exam</span>
+            </a>
+            <a class="nav-item" data-view="mistakes">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                <span>Mistakes Bank</span>
+                <span class="badge" id="side-wrong-count">0</span>
+            </a>
+
+            <div class="menu-label">Data Management</div>
+            <a class="nav-item" data-view="upload">
+                <i class="fa-solid fa-file-arrow-up"></i>
+                <span>Import JSON</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <span style="font-size: 0.85rem; font-weight: 700; color: var(--text-muted);">Dark Mode</span>
+            <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle Dark/Light Mode">
+                <i class="fa-solid fa-moon" id="theme-icon"></i>
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Application Area -->
+    <div class="app-container">
+        
+        <!-- Header Navbar -->
+        <header class="top-navbar">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <button class="mobile-toggle" id="mobile-toggle-btn" aria-label="Toggle Navigation">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+                <div class="header-title" id="page-header-title">
+                    <i class="fa-solid fa-chart-line" style="color: var(--primary);"></i>
+                    <span>Dashboard Overview</span>
+                </div>
+            </div>
+
+            <div class="header-stats">
+                <div class="stat-chip total">
+                    <i class="fa-solid fa-database"></i>
+                    <span id="stat-total-q">0 Questions</span>
+                </div>
+                <div class="stat-chip wrong">
+                    <i class="fa-solid fa-circle-xmark"></i>
+                    <span id="stat-wrong-q">0 Mistakes</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Dynamic Main Views -->
+        <main class="main-content">
+
+            <!-- DASHBOARD VIEW -->
+            <section id="view-dashboard">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <i class="fa-solid fa-bolt"></i>
+                            Quick Examination Launch
+                        </div>
+                    </div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label><i class="fa-solid fa-layer-group"></i> Subject Category</label>
+                            <select id="quick-category-select">
+                                <option value="all">All Available Subjects</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fa-solid fa-list-ol"></i> Question Count</label>
+                            <input type="number" id="quick-question-count" min="1" value="10">
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fa-solid fa-folder"></i> Section</label>
+                            <select id="quick-section-select">
+                                <option value="all">All Sections</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fa-solid fa-crosshairs"></i> Exam Target Mode</label>
+                            <select id="quick-exam-mode">
+                                <option value="all">Standard Random Quiz</option>
+                                <option value="wrong">Mistakes Only (Re-Exam)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fa-solid fa-clock"></i> Time Limit (minutes)</label>
+                            <input type="number" id="quick-time-limit" min="0" value="30">
+                            <span class="helper-text">Use 0 for unlimited time.</span>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary btn-full" id="btn-start-quick-exam">
+                        <i class="fa-solid fa-play"></i> Start Examination Session
+                    </button>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <i class="fa-solid fa-folder-tree"></i>
+                            Subject Overview
+                        </div>
+                    </div>
+                    <div class="category-grid" id="dashboard-categories-grid"></div>
+                </div>
+            </section>
+
+            <!-- CATEGORIES VIEW -->
+            <section id="view-categories" class="hidden">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <i class="fa-solid fa-layer-group"></i>
+                            Question Categories & Banks
+                        </div>
+                    </div>
+                    <div class="category-grid" id="full-categories-grid"></div>
+                </div>
+            </section>
+
+            <!-- CUSTOM TEST VIEW -->
+            <section id="view-custom-test" class="hidden">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <i class="fa-solid fa-sliders"></i>
+                            Custom Test Configuration
+                        </div>
+                    </div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Filter Subject Category</label>
+                            <select id="custom-cat-select">
+                                <option value="all">All Subjects</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Section</label>
+                            <select id="custom-section-select">
+                                <option value="all">All Sections</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Number of Questions</label>
+                            <input type="number" id="custom-q-count" value="15" min="1">
+                        </div>
+                        <div class="form-group">
+                            <label>Time Limit (minutes)</label>
+                            <input type="number" id="custom-time-limit" value="30" min="0">
+                            <span class="helper-text">0 = unlimited.</span>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary btn-full" id="btn-start-custom-exam">
+                        <i class="fa-solid fa-paper-plane"></i> Launch Custom Test
+                    </button>
+                </div>
+            </section>
+
+            <!-- MISTAKES BANK VIEW -->
+            <section id="view-mistakes" class="hidden">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <i class="fa-solid fa-triangle-exclamation" style="color: var(--danger);"></i>
+                            Mistakes Memory Bank
+                        </div>
+                    </div>
+                    <p style="margin-bottom: 1.75rem; color: var(--text-muted); font-weight: 500; line-height: 1.6;">
+                        Med 64 automatically tracks every question you answer incorrectly. You can re-examine yourself exclusively on these questions to enforce mastery.
+                    </p>
+                    <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                        <button class="btn btn-primary" id="btn-start-mistakes-exam">
+                            <i class="fa-solid fa-rotate-left"></i> Re-examine All Mistakes
+                        </button>
+                        <button class="btn btn-danger" id="btn-clear-mistakes">
+                            <i class="fa-solid fa-trash-can"></i> Clear Mistakes Memory
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- UPLOAD VIEW -->
+            <section id="view-upload" class="hidden">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <i class="fa-solid fa-file-arrow-up"></i>
+                            Import Question File (JSON)
+                        </div>
+                    </div>
+
+                    <!-- Enhanced Upload Trigger Area -->
+                    <div class="upload-dropzone" id="drop-zone">
+                        <div class="upload-icon">
+                            <i class="fa-solid fa-cloud-arrow-up"></i>
+                        </div>
+                        <h3 style="font-size: 1.25rem; color: var(--text-title); margin-bottom: 0.5rem; font-weight: 800;">
+                            Click or Drag & Drop JSON Question Bank
+                        </h3>
+                        <p style="font-size: 0.9rem; color: var(--text-muted); font-weight: 500;">
+                            Your uploaded files are processed and saved securely in your browser local storage.
+                        </p>
+                        <!-- Native Input Element -->
+                        <input type="file" id="file-input" accept=".json,application/json" style="display: none;">
+                    </div>
+                    <div class="upload-meta" id="upload-meta">
+                        <strong><i class="fa-solid fa-folder"></i> Import section</strong>
+                        <p style="margin:0.4rem 0 0.9rem;color:var(--text-muted);font-size:0.85rem;">
+                            After choosing a JSON file, enter the section name that should be assigned to the imported questions.
+                        </p>
+                        <div class="form-group">
+                            <label for="upload-section-input">Section name</label>
+                            <input type="text" id="upload-section-input" placeholder="e.g. Cardiovascular, Anatomy, Lecture 4">
+                        </div>
+                        <button class="btn btn-primary" id="btn-confirm-import" style="margin-top:1rem;">
+                            <i class="fa-solid fa-file-import"></i> Import Questions
+                        </button>
+                    </div>
+
+                    <div style="margin-top: 1.75rem; display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap;">
+                        <button class="btn btn-secondary" id="btn-sample-json">
+                            <i class="fa-solid fa-download"></i> Download Sample Format
+                        </button>
+                        <button class="btn btn-danger" id="btn-reset-db">
+                            <i class="fa-solid fa-triangle-exclamation"></i> Reset Entire Database
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ACTIVE QUIZ ENGINE VIEW -->
+            <section id="view-quiz" class="hidden">
+                <div class="card">
+                    <div class="quiz-top-bar">
+                        <div class="category-pill" id="quiz-cat-pill">
+                            <i class="fa-solid fa-tag"></i> General
+                        </div>
+                        <div style="display:flex;align-items:center;gap:0.75rem;flex-wrap:wrap;justify-content:flex-end;">
+                            <div class="progress-text" id="quiz-progress-text">Question 1 of 10</div>
+                            <div class="exam-timer hidden" id="exam-timer">00:00</div>
+                        </div>
+                    </div>
+
+                    <div class="question-box" id="question-text-box"></div>
+
+                    <div class="options-grid" id="options-container"></div>
+
+                    <div id="explanation-box" class="explanation-card hidden">
+                        <strong><i class="fa-solid fa-lightbulb"></i> Medical Explanation:</strong>
+                        <div id="explanation-text"></div>
+                    </div>
+
+                    <button id="btn-next-q" class="btn btn-primary btn-full hidden">
+                        Next Question <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+            </section>
+
+            <!-- RESULTS REPORT VIEW -->
+            <section id="view-results" class="hidden">
+                <div class="card result-box">
+                    <div class="score-dial" id="score-dial">0%</div>
+                    <h2 style="font-size: 1.75rem; color: var(--text-title); margin-bottom: 0.5rem; font-weight: 800;">Exam Completed!</h2>
+                    <p id="score-summary-text" style="color: var(--text-muted); margin-bottom: 2rem; font-weight: 600; font-size: 1.05rem;">You scored 0 out of 0 questions correctly.</p>
+
+                    <div style="display: flex; gap: 1rem; justify-content: center; max-width: 450px; margin: 0 auto; flex-wrap: wrap;">
+                        <button class="btn btn-primary btn-full" id="btn-results-home">
+                            <i class="fa-solid fa-house"></i> Return Home
+                        </button>
+                        <button class="btn btn-secondary btn-full" id="btn-result-reexam">
+                            <i class="fa-solid fa-rotate-left"></i> Re-Exam Mistakes
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- Application JavaScript Engine -->
+    <script>
+        // --- APP STATE ---
+        let questionsDB = [];
+        let wrongQuestionsIDs = new Set();
+        let currentExamPool = [];
+        let currentQIndex = 0;
+        let score = 0;
+        let examTimerInterval = null;
+        let examTimeRemaining = 0;
+
+        // --- DOM INITIALIZATION & EVENT LISTENERS ---
+        document.addEventListener('DOMContentLoaded', async () => {
+            loadDatabase();
+            setupEventListeners();
+            updateAllUIComponents();
+            await loadBuiltInQuestions();
+
+            // Theme setup
+            if (localStorage.getItem('med64_theme') === 'dark') {
+                document.body.classList.add('dark-theme');
+                document.getElementById('theme-icon').className = 'fa-solid fa-sun';
+            }
+        });
+
+        // Safe Event Binding Helper
+        function setupEventListeners() {
+            // Sidebar Navigation Item Clicks
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.addEventListener('click', (e) => {
+                    const targetView = item.getAttribute('data-view');
+                    navigateTo(targetView, item);
+                });
+            });
+
+            // Mobile Navigation Toggle & Backdrop Overlay
+            const mobileBtn = document.getElementById('mobile-toggle-btn');
+            const overlay = document.getElementById('sidebar-overlay');
+            if (mobileBtn) mobileBtn.addEventListener('click', toggleSidebar);
+            if (overlay) overlay.addEventListener('click', closeSidebar);
+
+            // Theme Toggle
+            const themeBtn = document.getElementById('theme-toggle-btn');
+            if (themeBtn) themeBtn.addEventListener('click', toggleTheme);
+
+            // Action Buttons
+            document.getElementById('btn-start-quick-exam')?.addEventListener('click', startQuickExam);
+            document.getElementById('btn-start-custom-exam')?.addEventListener('click', startCustomExam);
+            document.getElementById('btn-start-mistakes-exam')?.addEventListener('click', startMistakesExam);
+            document.getElementById('btn-clear-mistakes')?.addEventListener('click', clearMistakesMemory);
+            document.getElementById('btn-reset-db')?.addEventListener('click', resetEntireDatabase);
+            document.getElementById('btn-sample-json')?.addEventListener('click', downloadSampleJSON);
+            document.getElementById('btn-confirm-import')?.addEventListener('click', confirmImport);
+            document.getElementById('btn-next-q')?.addEventListener('click', nextQuestion);
+            document.getElementById('btn-results-home')?.addEventListener('click', () => navigateTo('dashboard'));
+            document.getElementById('btn-result-reexam')?.addEventListener('click', startMistakesExam);
+
+            // FILE UPLOAD LISTENERS (Drag & Drop + Input Click)
+            const dropZone = document.getElementById('drop-zone');
+            const fileInput = document.getElementById('file-input');
+
+            if (dropZone && fileInput) {
+                // Click Dropzone to open file dialog
+                dropZone.addEventListener('click', () => fileInput.click());
+
+                // File Select Action
+                fileInput.addEventListener('change', handleFileUpload);
+
+                // Drag & Drop Handling
+                ['dragenter', 'dragover'].forEach(eventName => {
+                    dropZone.addEventListener(eventName, (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        dropZone.classList.add('dragover');
+                    }, false);
+                });
+
+                ['dragleave', 'drop'].forEach(eventName => {
+                    dropZone.addEventListener(eventName, (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        dropZone.classList.remove('dragover');
+                    }, false);
+                });
+
+                dropZone.addEventListener('drop', (e) => {
+                    const dt = e.dataTransfer;
+                    const files = dt.files;
+                    if (files.length > 0) {
+                        fileInput.files = files;
+                        handleFileUpload({ target: { files: files } });
+                    }
+                });
+            }
+        }
+
+        // --- LOCAL STORAGE DATA PERSISTENCE ---
+        function saveDatabase() {
+            localStorage.setItem('med64_questions', JSON.stringify(questionsDB));
+            localStorage.setItem('med64_wrongs', JSON.stringify(Array.from(wrongQuestionsIDs)));
+        }
+
+        function loadDatabase() {
+            const qData = localStorage.getItem('med64_questions');
+            const wData = localStorage.getItem('med64_wrongs');
+
+            if (qData) questionsDB = JSON.parse(qData);
+            if (wData) wrongQuestionsIDs = new Set(JSON.parse(wData));
+
+            if (questionsDB.length === 0) {
+                questionsDB = getInitialSampleData();
+                saveDatabase();
+            }
+        }
+
+        // --- BUILT-IN GITHUB / VERCEL QUESTION BANK ---
+        // Put your editable question bank at /questions.json in the GitHub repository.
+        // Vercel will serve it automatically after deployment.
+        async function loadBuiltInQuestions() {
+            try {
+                const response = await fetch('./questions.json', { cache: 'no-store' });
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+                const builtInData = await response.json();
+                if (!Array.isArray(builtInData)) throw new Error('questions.json must contain an array.');
+
+                const existingIDs = new Set(questionsDB.map(q => q.id));
+                let added = 0;
+
+                builtInData.forEach(q => {
+                    if (!q || !q.question || !Array.isArray(q.options)) return;
+
+                    const copy = { ...q };
+                    if (!copy.id) {
+                        copy.id = 'builtin_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8);
+                    }
+                    if (!copy.section) copy.section = copy.category || 'General';
+                    if (!copy.category) copy.category = copy.section;
+
+                    if (!existingIDs.has(copy.id)) {
+                        questionsDB.push(copy);
+                        existingIDs.add(copy.id);
+                        added++;
+                    }
+                });
+
+                if (added > 0) saveDatabase();
+                updateAllUIComponents();
+
+                console.log(`Built-in question bank loaded: ${builtInData.length} questions; ${added} new questions added.`);
+            } catch (error) {
+                // Keep the app usable when questions.json is missing during local testing.
+                console.warn('Built-in question bank could not be loaded:', error.message);
+            }
+        }
+
+        // --- NAVIGATION & ROUTING ---
+        function navigateTo(viewId, navElement = null) {
+            const views = ['dashboard', 'categories', 'custom-test', 'mistakes', 'upload', 'quiz', 'results'];
+            views.forEach(v => {
+                const el = document.getElementById(`view-${v}`);
+                if (el) el.classList.add('hidden');
+            });
+
+            const targetView = document.getElementById(`view-${viewId}`);
+            if (targetView) targetView.classList.remove('hidden');
+
+            const titleMap = {
+                'dashboard': '<i class="fa-solid fa-chart-line" style="color: var(--primary);"></i><span>Dashboard Overview</span>',
+                'categories': '<i class="fa-solid fa-layer-group" style="color: var(--primary);"></i><span>Subject Categories</span>',
+                'custom-test': '<i class="fa-solid fa-sliders" style="color: var(--primary);"></i><span>Custom Examination</span>',
+                'mistakes': '<i class="fa-solid fa-triangle-exclamation" style="color: var(--danger);"></i><span>Mistakes Memory Bank</span>',
+                'upload': '<i class="fa-solid fa-file-arrow-up" style="color: var(--primary);"></i><span>Import MCQ Files</span>',
+                'quiz': '<i class="fa-solid fa-pen-to-square" style="color: var(--primary);"></i><span>Active Examination Session</span>',
+                'results': '<i class="fa-solid fa-square-poll-vertical" style="color: var(--primary);"></i><span>Session Score Report</span>'
+            };
+            document.getElementById('page-header-title').innerHTML = titleMap[viewId] || 'Med 64';
+
+            // Update sidebar highlight
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+            if (navElement) {
+                navElement.classList.add('active');
+            } else {
+                const matchingNav = document.querySelector(`.nav-item[data-view="${viewId}"]`);
+                if (matchingNav) matchingNav.classList.add('active');
+            }
+
+            updateAllUIComponents();
+            closeSidebar();
+        }
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
+        }
+
+        function closeSidebar() {
+            document.getElementById('sidebar').classList.remove('active');
+            document.getElementById('sidebar-overlay').classList.remove('active');
+        }
+
+        function toggleTheme() {
+            document.body.classList.toggle('dark-theme');
+            const isDark = document.body.classList.contains('dark-theme');
+            localStorage.setItem('med64_theme', isDark ? 'dark' : 'light');
+            document.getElementById('theme-icon').className = isDark ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+        }
+
+        // --- UI REFRESH & RENDER ---
+        function updateAllUIComponents() {
+            document.getElementById('stat-total-q').innerText = `${questionsDB.length} Questions`;
+            document.getElementById('stat-wrong-q').innerText = `${wrongQuestionsIDs.size} Mistakes`;
+
+            const categories = [...new Set(questionsDB.map(q => q.category || 'General'))];
+            document.getElementById('side-cat-count').innerText = categories.length;
+            document.getElementById('side-wrong-count').innerText = wrongQuestionsIDs.size;
+
+            const catSelects = [document.getElementById('quick-category-select'), document.getElementById('custom-cat-select')];
+            catSelects.forEach(sel => {
+                if (!sel) return;
+                const currentVal = sel.value;
+                sel.innerHTML = '<option value="all">All Available Subjects</option>';
+                categories.forEach(cat => {
+                    const opt = document.createElement('option');
+                    opt.value = cat;
+                    opt.innerText = cat;
+                    sel.appendChild(opt);
+                });
+                sel.value = categories.includes(currentVal) ? currentVal : 'all';
+            });
+
+            const sections = [...new Set(questionsDB.map(q => q.section || q.category || 'General'))].filter(Boolean).sort();
+            [document.getElementById('quick-section-select'), document.getElementById('custom-section-select')].forEach(sel => {
+                if (!sel) return;
+                const currentVal = sel.value;
+                sel.innerHTML = '<option value="all">All Sections</option>';
+                sections.forEach(section => {
+                    const opt = document.createElement('option');
+                    opt.value = section;
+                    opt.innerText = section;
+                    sel.appendChild(opt);
+                });
+                sel.value = sections.includes(currentVal) ? currentVal : 'all';
+            });
+
+            renderCategoryGrids(categories);
+        }
+
+        function renderCategoryGrids(categories) {
+            const dashGrid = document.getElementById('dashboard-categories-grid');
+            const fullGrid = document.getElementById('full-categories-grid');
+
+            const render = (container) => {
+                if (!container) return;
+                container.innerHTML = '';
+                categories.forEach(cat => {
+                    const qCount = questionsDB.filter(q => (q.category || 'General') === cat).length;
+                    const card = document.createElement('div');
+                    card.className = 'category-card';
+                    card.onclick = () => launchEngine(cat, 10, 'all');
+                    card.innerHTML = `
+                        <h4><i class="fa-solid fa-folder-open" style="color: var(--primary);"></i> ${cat}</h4>
+                        <p>${qCount} Questions Available</p>
+                    `;
+                    container.appendChild(card);
+                });
+            };
+
+            render(dashGrid);
+            render(fullGrid);
+        }
+
+        // --- EXAMINATION & QUIZ LOGIC ---
+        function startQuickExam() {
+            const cat = document.getElementById('quick-category-select').value;
+            const count = parseInt(document.getElementById('quick-question-count').value) || 10;
+            const section = document.getElementById('quick-section-select').value;
+            const mode = document.getElementById('quick-exam-mode').value;
+            const minutes = Math.max(0, parseInt(document.getElementById('quick-time-limit').value) || 0);
+            launchEngine(cat, count, mode, section, minutes);
+        }
+
+        function startCustomExam() {
+            const cat = document.getElementById('custom-cat-select').value;
+            const count = parseInt(document.getElementById('custom-q-count').value) || 15;
+            const section = document.getElementById('custom-section-select').value;
+            const minutes = Math.max(0, parseInt(document.getElementById('custom-time-limit').value) || 0);
+            launchEngine(cat, count, 'all', section, minutes);
+        }
+
+        function startMistakesExam() {
+            if (wrongQuestionsIDs.size === 0) {
+                alert('No mistakes recorded in your memory bank!');
+                return;
+            }
+            launchEngine('all', wrongQuestionsIDs.size, 'wrong');
+        }
+
+        function launchEngine(category, count, mode, section = 'all', timeLimitMinutes = 0) {
+            let pool = [...questionsDB];
+
+            if (category !== 'all') {
+                pool = pool.filter(q => (q.category || 'General') === category);
+            }
+
+            if (section !== 'all') {
+                pool = pool.filter(q => (q.section || q.category || 'General') === section);
+            }
+
+            if (mode === 'wrong') {
+                pool = pool.filter(q => wrongQuestionsIDs.has(q.id));
+            }
+
+            if (pool.length === 0) {
+                alert('No questions match the selected criteria.');
+                return;
+            }
+
+            currentExamPool = pool.sort(() => 0.5 - Math.random()).slice(0, Math.max(1, count));
+            currentQIndex = 0;
+            score = 0;
+
+            startExamTimer(timeLimitMinutes);
+            navigateTo('quiz');
+            renderActiveQuestion();
+        }
+
+        function startExamTimer(minutes) {
+            clearInterval(examTimerInterval);
+            const timer = document.getElementById('exam-timer');
+            if (!timer) return;
+
+            if (!minutes || minutes <= 0) {
+                timer.classList.add('hidden');
+                examTimeRemaining = 0;
+                return;
+            }
+
+            examTimeRemaining = minutes * 60;
+            timer.classList.remove('hidden');
+            updateExamTimerDisplay();
+
+            examTimerInterval = setInterval(() => {
+                examTimeRemaining--;
+                updateExamTimerDisplay();
+                if (examTimeRemaining <= 0) {
+                    clearInterval(examTimerInterval);
+                    alert('Time is up. Your exam will be submitted automatically.');
+                    finishExam();
+                }
+            }, 1000);
+        }
+
+        function updateExamTimerDisplay() {
+            const timer = document.getElementById('exam-timer');
+            if (!timer) return;
+            const mins = Math.floor(examTimeRemaining / 60);
+            const secs = examTimeRemaining % 60;
+            timer.innerText = `${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}`;
+            timer.classList.toggle('warning', examTimeRemaining <= 60);
+        }
+
+        function renderActiveQuestion() {
+            const q = currentExamPool[currentQIndex];
+
+            document.getElementById('quiz-cat-pill').innerHTML = `<i class="fa-solid fa-tag"></i> ${q.category || 'General'}`;
+            document.getElementById('quiz-progress-text').innerText = `Question ${currentQIndex + 1} of ${currentExamPool.length}`;
+            document.getElementById('question-text-box').innerText = q.question;
+
+            const optionsContainer = document.getElementById('options-container');
+            optionsContainer.innerHTML = '';
+
+            document.getElementById('explanation-box').classList.add('hidden');
+            document.getElementById('btn-next-q').classList.add('hidden');
+
+            q.options.forEach((optText, idx) => {
+                const optCard = document.createElement('div');
+                optCard.className = 'option-card';
+                optCard.innerHTML = `<span>${optText}</span><i class="fa-regular fa-circle" style="color: var(--text-muted);"></i>`;
+                optCard.onclick = () => selectOption(idx, q.correctIndex);
+                optionsContainer.appendChild(optCard);
+            });
+        }
+
+        function selectOption(selectedIndex, correctIndex) {
+            const cards = document.querySelectorAll('.option-card');
+            const currentQ = currentExamPool[currentQIndex];
+
+            cards.forEach(c => c.classList.add('disabled'));
+
+            if (selectedIndex === correctIndex) {
+                cards[selectedIndex].classList.add('correct');
+                cards[selectedIndex].querySelector('i').className = 'fa-solid fa-circle-check';
+                score++;
+                wrongQuestionsIDs.delete(currentQ.id);
+            } else {
+                cards[selectedIndex].classList.add('incorrect');
+                cards[selectedIndex].querySelector('i').className = 'fa-solid fa-circle-xmark';
+                
+                cards[correctIndex].classList.add('correct');
+                cards[correctIndex].querySelector('i').className = 'fa-solid fa-circle-check';
+
+                wrongQuestionsIDs.add(currentQ.id);
+            }
+
+            saveDatabase();
+
+            if (currentQ.explanation) {
+                document.getElementById('explanation-text').innerText = currentQ.explanation;
+                document.getElementById('explanation-box').classList.remove('hidden');
+            }
+
+            document.getElementById('btn-next-q').classList.remove('hidden');
+        }
+
+        function nextQuestion() {
+            currentQIndex++;
+            if (currentQIndex < currentExamPool.length) {
+                renderActiveQuestion();
+            } else {
+                finishExam();
+            }
+        }
+
+        function finishExam() {
+            clearInterval(examTimerInterval);
+            examTimerInterval = null;
+            const timer = document.getElementById('exam-timer');
+            if (timer) timer.classList.add('hidden');
+            navigateTo('results');
+            const pct = Math.round((score / currentExamPool.length) * 100);
+            document.getElementById('score-dial').innerText = `${pct}%`;
+            document.getElementById('score-summary-text').innerText = `You scored ${score} out of ${currentExamPool.length} questions correctly.`;
+            
+            const reexamBtn = document.getElementById('btn-result-reexam');
+            if (wrongQuestionsIDs.size === 0) {
+                reexamBtn.style.display = 'none';
+            } else {
+                reexamBtn.style.display = 'inline-flex';
+            }
+        }
+
+        // --- FILE UPLOAD & DATA MANAGEMENT ---
+        let pendingImportData = null;
+
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    if (!Array.isArray(data)) {
+                        alert('Invalid JSON structure. The file must contain an array of question objects.');
+                        return;
+                    }
+
+                    const validQuestions = data.filter(q => q && q.question && Array.isArray(q.options));
+                    if (validQuestions.length === 0) {
+                        alert('No valid question objects were found in this JSON file.');
+                        return;
+                    }
+
+                    pendingImportData = validQuestions;
+                    const meta = document.getElementById('upload-meta');
+                    const sectionInput = document.getElementById('upload-section-input');
+                    meta.style.display = 'block';
+                    sectionInput.value = '';
+                    sectionInput.focus();
+                    meta.querySelector('strong').innerHTML =
+                        `<i class="fa-solid fa-folder"></i> Import section (${validQuestions.length} questions ready)`;
+                } catch (err) {
+                    alert('Failed to parse JSON file. Please check file format.');
+                    pendingImportData = null;
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function confirmImport() {
+            if (!pendingImportData) {
+                alert('Please choose a JSON file first.');
+                return;
+            }
+
+            const sectionInput = document.getElementById('upload-section-input');
+            const section = sectionInput.value.trim();
+
+            if (!section) {
+                alert('Please enter a section name for the imported questions.');
+                sectionInput.focus();
+                return;
+            }
+
+            let addedCount = 0;
+            pendingImportData.forEach(q => {
+                const copy = { ...q };
+                if (!copy.id || questionsDB.some(existing => existing.id === copy.id)) {
+                    copy.id = 'q_' + Date.now() + '_' + Math.random().toString(36).substr(2, 8);
+                }
+                copy.section = section;
+                // Keep category if supplied; otherwise use the selected section.
+                if (!copy.category) copy.category = section;
+                questionsDB.push(copy);
+                addedCount++;
+            });
+
+            saveDatabase();
+            updateAllUIComponents();
+
+            pendingImportData = null;
+            document.getElementById('upload-meta').style.display = 'none';
+            document.getElementById('upload-section-input').value = '';
+            document.getElementById('file-input').value = '';
+
+            alert(`Successfully imported ${addedCount} questions into section "${section}".`);
+        }
+
+        function clearMistakesMemory() {
+            if (confirm('Clear all stored mistakes from memory?')) {
+                wrongQuestionsIDs.clear();
+                saveDatabase();
+                updateAllUIComponents();
+            }
+        }
+
+        function resetEntireDatabase() {
+            if (confirm('Are you sure you want to completely wipe all saved questions and reset the app?')) {
+                localStorage.removeItem('med64_questions');
+                localStorage.removeItem('med64_wrongs');
+                questionsDB = getInitialSampleData();
+                wrongQuestionsIDs.clear();
+                saveDatabase();
+                updateAllUIComponents();
+                alert('Database reset to initial state.');
+            }
+        }
+
+        function downloadSampleJSON() {
+            const sample = getInitialSampleData();
+            const blob = new Blob([JSON.stringify(sample, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'med64_sample_bank.json';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function getInitialSampleData() {
+            return [
+                {
+                    "id": "q1",
+                    "category": "Cardiology",
+                    "section": "Cardiology",
+                    "question": "Which of the following cardiac biomarkers is considered most specific for myocardial infarction?",
+                    "options": ["CK-MB", "Troponin I", "Myoglobin", "LDH-1"],
+                    "correctIndex": 1,
+                    "explanation": "Cardiac Troponins (I and T) exhibit key high cardiac specificity and remain elevated for up to 10-14 days post-MI."
+                },
+                {
+                    "id": "q2",
+                    "category": "Pharmacology",
+                    "section": "Pharmacology",
+                    "question": "Which drug class is recommended as first-line antihypertensive therapy in patients with diabetic nephropathy?",
+                    "options": ["Beta Blockers", "ACE Inhibitors", "Loop Diuretics", "Dihydropyridine CCBs"],
+                    "correctIndex": 1,
+                    "explanation": "ACE inhibitors dilate the efferent arteriole, reducing intraglomerular pressure and slowing proteinuria progression."
+                },
+                {
+                    "id": "q3",
+                    "category": "Anatomy",
+                    "section": "Anatomy",
+                    "question": "Which nerve travels directly through the carpal tunnel beneath the flexor retinaculum?",
+                    "options": ["Ulnar Nerve", "Radial Nerve", "Median Nerve", "Musculocutaneous Nerve"],
+                    "correctIndex": 2,
+                    "explanation": "The median nerve passes through the carpal tunnel alongside 9 flexor tendons."
+                }
+            ];
+        }
+    </script>
+</body>
+</html>
