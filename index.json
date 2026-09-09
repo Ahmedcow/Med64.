@@ -1,0 +1,17 @@
+{
+  "version": "1.0",
+  "files": [
+    {
+      "file": "cardiology.json",
+      "section": "Cardiology"
+    },
+    {
+      "file": "pharmacology.json",
+      "section": "Pharmacology"
+    },
+    {
+      "file": "anatomy.json",
+      "section": "Anatomy"
+    }
+  ]
+}

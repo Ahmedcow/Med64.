@@ -1186,8 +1186,9 @@
                 }));
 
                 const builtInData = results.flat();
-                const existingIDs = new Set(questionsDB.map(q => q.id));
+                const existingByID = new Map(questionsDB.map((q, index) => [q.id, index]));
                 let added = 0;
+                let updated = 0;
 
                 builtInData.forEach(q => {
                     if (!q || !q.question || !Array.isArray(q.options)) return;
@@ -1199,20 +1200,27 @@
                     if (!copy.section) copy.section = copy.category || 'General';
                     if (!copy.category) copy.category = copy.section;
 
-                    if (!existingIDs.has(copy.id)) {
+                    // GitHub is the source of truth for built-in questions.
+                    // Replace an existing question with the same ID so edits made
+                    // on GitHub are reflected in the website.
+                    if (existingByID.has(copy.id)) {
+                        questionsDB[existingByID.get(copy.id)] = copy;
+                        updated++;
+                    } else {
+                        existingByID.set(copy.id, questionsDB.length);
                         questionsDB.push(copy);
-                        existingIDs.add(copy.id);
                         added++;
                     }
                 });
 
-                if (added > 0) saveDatabase();
+                if (added > 0 || updated > 0) saveDatabase();
                 updateAllUIComponents();
 
-                console.log(`Built-in question bank loaded: ${builtInData.length} questions from ${files.length} files; ${added} new questions added.`);
+                console.log(`GitHub question bank loaded: ${builtInData.length} questions from ${files.length} files; ${added} added, ${updated} updated.`);
             } catch (error) {
                 // Keep the app usable when the GitHub question bank is missing during local testing.
-                console.warn('Built-in question bank could not be loaded:', error.message);
+                console.error('GitHub question bank could not be loaded:', error);
+                console.warn('Check that /questions/index.json and every listed JSON file are committed to the GitHub repository and deployed by Vercel.');
             }
         }
 
@@ -1615,7 +1623,7 @@
         function getInitialSampleData() {
             return [
                 {
-                    "id": "q1",
+                    "id": "sample-q1",
                     "category": "Cardiology",
                     "section": "Cardiology",
                     "question": "Which of the following cardiac biomarkers is considered most specific for myocardial infarction?",
@@ -1624,7 +1632,7 @@
                     "explanation": "Cardiac Troponins (I and T) exhibit key high cardiac specificity and remain elevated for up to 10-14 days post-MI."
                 },
                 {
-                    "id": "q2",
+                    "id": "sample-q2",
                     "category": "Pharmacology",
                     "section": "Pharmacology",
                     "question": "Which drug class is recommended as first-line antihypertensive therapy in patients with diabetic nephropathy?",
@@ -1633,7 +1641,7 @@
                     "explanation": "ACE inhibitors dilate the efferent arteriole, reducing intraglomerular pressure and slowing proteinuria progression."
                 },
                 {
-                    "id": "q3",
+                    "id": "sample-q3",
                     "category": "Anatomy",
                     "section": "Anatomy",
                     "question": "Which nerve travels directly through the carpal tunnel beneath the flexor retinaculum?",
