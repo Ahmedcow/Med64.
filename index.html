@@ -702,6 +702,91 @@
             font-weight: 600;
         }
 
+
+        /* Progress Dashboard */
+        .progress-summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .progress-stat {
+            padding: 1rem 1.15rem;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            background: var(--bg-main);
+        }
+        .progress-stat .value {
+            display: block;
+            font-size: 1.45rem;
+            font-weight: 800;
+            color: var(--text-title);
+        }
+        .progress-stat .label {
+            display: block;
+            margin-top: .25rem;
+            font-size: .78rem;
+            font-weight: 700;
+            color: var(--text-muted);
+        }
+        .progress-section {
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            margin-bottom: .85rem;
+            overflow: hidden;
+            background: var(--card-bg);
+        }
+        .progress-section summary {
+            list-style: none;
+            cursor: pointer;
+            padding: 1rem 1.15rem;
+            display: flex;
+            align-items: center;
+            gap: .8rem;
+        }
+        .progress-section summary::-webkit-details-marker { display: none; }
+        .progress-section summary:hover { background: var(--bg-main); }
+        .progress-section-title { flex: 1; min-width: 0; }
+        .progress-section-title strong { color: var(--text-title); display:block; }
+        .progress-section-title span { color: var(--text-muted); font-size: .78rem; font-weight: 600; }
+        .progress-percent { font-weight: 800; color: var(--primary); white-space: nowrap; }
+        .progress-bar {
+            height: 8px;
+            background: var(--border-color);
+            border-radius: 999px;
+            overflow: hidden;
+        }
+        .progress-bar > span {
+            display: block;
+            height: 100%;
+            width: 0;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            border-radius: inherit;
+            transition: width .35s ease;
+        }
+        .progress-section-body { padding: 0 1.15rem 1rem; }
+        .progress-category-row { padding: .75rem 0; border-top: 1px solid var(--border-color); }
+        .progress-category-head { display:flex; justify-content:space-between; gap:1rem; margin-bottom:.45rem; font-size:.84rem; font-weight:700; }
+        .progress-category-head span:first-child { color:var(--text-title); }
+        .progress-category-head span:last-child { color:var(--text-muted); }
+        .progress-empty { color: var(--text-muted); font-size: .9rem; padding: .5rem 0; }
+        .sidebar-progress { padding: 0 1rem 1rem; }
+        .sidebar-progress-card { border:1px solid var(--border-color); border-radius:var(--radius-md); padding:.8rem; background:var(--bg-main); }
+        .sidebar-progress-head { display:flex; justify-content:space-between; gap:.5rem; font-size:.76rem; font-weight:800; color:var(--text-title); margin-bottom:.45rem; }
+        .sidebar-progress-item { margin-top:.65rem; }
+        .sidebar-progress-item > div { display:flex; justify-content:space-between; gap:.5rem; font-size:.7rem; color:var(--text-muted); font-weight:700; margin-bottom:.3rem; }
+        .sidebar-progress .progress-bar { height:5px; }
+        .answer-mode-note { margin-top:.35rem; font-size:.78rem; color:var(--text-muted); line-height:1.45; }
+        .review-list { display:flex; flex-direction:column; gap: .85rem; margin-top:1.5rem; }
+        .review-item { border:1px solid var(--border-color); border-radius:var(--radius-md); padding:1rem 1.1rem; background:var(--bg-main); }
+        .review-item.correct { border-left:4px solid var(--success); }
+        .review-item.incorrect { border-left:4px solid var(--danger); }
+        .review-question { font-weight:800; color:var(--text-title); line-height:1.5; margin-bottom:.7rem; }
+        .review-answer { font-size:.88rem; line-height:1.55; margin-top:.3rem; }
+        .review-answer.correct-text { color:var(--success); font-weight:800; }
+        .review-answer.incorrect-text { color:var(--danger); font-weight:800; }
+        .sidebar-menu .nav-item.progress-nav { margin-bottom: .15rem; }
+
         .hidden { display: none !important; }
 
         /* Mobile Breakpoints & Responsive Drawer */
@@ -762,6 +847,13 @@
                 <span>Categories</span>
                 <span class="badge" id="side-cat-count">0</span>
             </a>
+            <a class="nav-item progress-nav" data-view="progress">
+                <i class="fa-solid fa-chart-simple"></i>
+                <span>Progress</span>
+                <span class="badge" id="side-progress-percent">0%</span>
+            </a>
+
+            <div class="sidebar-progress" id="sidebar-progress-widget"></div>
 
             <div class="menu-label">Exams & Revision</div>
             <a class="nav-item" data-view="custom-test">
@@ -872,6 +964,32 @@
                     </div>
                     <div class="category-grid" id="dashboard-categories-grid"></div>
                 </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <i class="fa-solid fa-chart-simple"></i>
+                            Progress by Section & Category
+                        </div>
+                    </div>
+                    <div id="dashboard-progress-summary"></div>
+                </div>
+            </section>
+
+            <!-- PROGRESS VIEW -->
+            <section id="view-progress" class="hidden">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <i class="fa-solid fa-chart-simple"></i>
+                            Learning Progress
+                        </div>
+                        <button class="btn btn-secondary" id="btn-reset-progress">
+                            <i class="fa-solid fa-rotate-left"></i> Reset Progress
+                        </button>
+                    </div>
+                    <div id="full-progress-summary"></div>
+                </div>
             </section>
 
             <!-- CATEGORIES VIEW -->
@@ -917,6 +1035,14 @@
                             <label>Time Limit (minutes)</label>
                             <input type="number" id="custom-time-limit" value="30" min="0">
                             <span class="helper-text">0 = unlimited.</span>
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fa-solid fa-eye"></i> Answer Display</label>
+                            <select id="custom-answer-mode">
+                                <option value="immediate">Show answer immediately</option>
+                                <option value="after">Show answers after finishing</option>
+                            </select>
+                            <span class="answer-mode-note">Choose whether the correct answer is revealed after each question or only in the final review.</span>
                         </div>
                     </div>
                     <button class="btn btn-primary btn-full" id="btn-start-custom-exam">
@@ -1032,6 +1158,8 @@
                     <h2 style="font-size: 1.75rem; color: var(--text-title); margin-bottom: 0.5rem; font-weight: 800;">Exam Completed!</h2>
                     <p id="score-summary-text" style="color: var(--text-muted); margin-bottom: 2rem; font-weight: 600; font-size: 1.05rem;">You scored 0 out of 0 questions correctly.</p>
 
+                    <div id="exam-review-container"></div>
+
                     <div style="display: flex; gap: 1rem; justify-content: center; max-width: 450px; margin: 0 auto; flex-wrap: wrap;">
                         <button class="btn btn-primary btn-full" id="btn-results-home">
                             <i class="fa-solid fa-house"></i> Return Home
@@ -1056,6 +1184,9 @@
         let score = 0;
         let examTimerInterval = null;
         let examTimeRemaining = 0;
+        let currentAnswerMode = 'immediate';
+        let currentExamAnswers = {};
+        let progressDB = {};
 
         // --- DOM INITIALIZATION & EVENT LISTENERS ---
         document.addEventListener('DOMContentLoaded', async () => {
@@ -1102,6 +1233,7 @@
             document.getElementById('btn-next-q')?.addEventListener('click', nextQuestion);
             document.getElementById('btn-results-home')?.addEventListener('click', () => navigateTo('dashboard'));
             document.getElementById('btn-result-reexam')?.addEventListener('click', startMistakesExam);
+            document.getElementById('btn-reset-progress')?.addEventListener('click', resetProgress);
 
             // FILE UPLOAD LISTENERS (Drag & Drop + Input Click)
             const dropZone = document.getElementById('drop-zone');
@@ -1146,14 +1278,19 @@
         function saveDatabase() {
             localStorage.setItem('med64_questions', JSON.stringify(questionsDB));
             localStorage.setItem('med64_wrongs', JSON.stringify(Array.from(wrongQuestionsIDs)));
+            localStorage.setItem('med64_progress', JSON.stringify(progressDB));
         }
 
         function loadDatabase() {
             const qData = localStorage.getItem('med64_questions');
             const wData = localStorage.getItem('med64_wrongs');
+            const pData = localStorage.getItem('med64_progress');
 
             if (qData) questionsDB = JSON.parse(qData);
             if (wData) wrongQuestionsIDs = new Set(JSON.parse(wData));
+            if (pData) {
+                try { progressDB = JSON.parse(pData) || {}; } catch (e) { progressDB = {}; }
+            }
 
             if (questionsDB.length === 0) {
                 questionsDB = getInitialSampleData();
@@ -1226,7 +1363,7 @@
 
         // --- NAVIGATION & ROUTING ---
         function navigateTo(viewId, navElement = null) {
-            const views = ['dashboard', 'categories', 'custom-test', 'mistakes', 'upload', 'quiz', 'results'];
+            const views = ['dashboard', 'progress', 'categories', 'custom-test', 'mistakes', 'upload', 'quiz', 'results'];
             views.forEach(v => {
                 const el = document.getElementById(`view-${v}`);
                 if (el) el.classList.add('hidden');
@@ -1238,6 +1375,7 @@
             const titleMap = {
                 'dashboard': '<i class="fa-solid fa-chart-line" style="color: var(--primary);"></i><span>Dashboard Overview</span>',
                 'categories': '<i class="fa-solid fa-layer-group" style="color: var(--primary);"></i><span>Subject Categories</span>',
+                'progress': '<i class="fa-solid fa-chart-simple" style="color: var(--primary);"></i><span>Learning Progress</span>',
                 'custom-test': '<i class="fa-solid fa-sliders" style="color: var(--primary);"></i><span>Custom Examination</span>',
                 'mistakes': '<i class="fa-solid fa-triangle-exclamation" style="color: var(--danger);"></i><span>Mistakes Memory Bank</span>',
                 'upload': '<i class="fa-solid fa-file-arrow-up" style="color: var(--primary);"></i><span>Import MCQ Files</span>',
@@ -1316,6 +1454,7 @@
             });
 
             renderCategoryGrids(categories);
+            renderProgressViews();
         }
 
         function renderCategoryGrids(categories) {
@@ -1357,7 +1496,8 @@
             const count = parseInt(document.getElementById('custom-q-count').value) || 15;
             const section = document.getElementById('custom-section-select').value;
             const minutes = Math.max(0, parseInt(document.getElementById('custom-time-limit').value) || 0);
-            launchEngine(cat, count, 'all', section, minutes);
+            const answerMode = document.getElementById('custom-answer-mode')?.value || 'immediate';
+            launchEngine(cat, count, 'all', section, minutes, answerMode);
         }
 
         function startMistakesExam() {
@@ -1368,7 +1508,7 @@
             launchEngine('all', wrongQuestionsIDs.size, 'wrong');
         }
 
-        function launchEngine(category, count, mode, section = 'all', timeLimitMinutes = 0) {
+        function launchEngine(category, count, mode, section = 'all', timeLimitMinutes = 0, answerMode = 'immediate') {
             let pool = [...questionsDB];
 
             if (category !== 'all') {
@@ -1391,6 +1531,8 @@
             currentExamPool = pool.sort(() => 0.5 - Math.random()).slice(0, Math.max(1, count));
             currentQIndex = 0;
             score = 0;
+            currentAnswerMode = answerMode === 'after' ? 'after' : 'immediate';
+            currentExamAnswers = {};
 
             startExamTimer(timeLimitMinutes);
             navigateTo('quiz');
@@ -1457,31 +1599,41 @@
         function selectOption(selectedIndex, correctIndex) {
             const cards = document.querySelectorAll('.option-card');
             const currentQ = currentExamPool[currentQIndex];
+            if (currentExamAnswers[currentQ.id]) return;
 
+            currentExamAnswers[currentQ.id] = { selectedIndex, correctIndex };
             cards.forEach(c => c.classList.add('disabled'));
 
-            if (selectedIndex === correctIndex) {
-                cards[selectedIndex].classList.add('correct');
-                cards[selectedIndex].querySelector('i').className = 'fa-solid fa-circle-check';
+            const isCorrect = selectedIndex === correctIndex;
+            if (isCorrect) {
                 score++;
                 wrongQuestionsIDs.delete(currentQ.id);
             } else {
-                cards[selectedIndex].classList.add('incorrect');
-                cards[selectedIndex].querySelector('i').className = 'fa-solid fa-circle-xmark';
-                
-                cards[correctIndex].classList.add('correct');
-                cards[correctIndex].querySelector('i').className = 'fa-solid fa-circle-check';
-
                 wrongQuestionsIDs.add(currentQ.id);
             }
 
-            saveDatabase();
+            // Record long-term progress per question.
+            if (!progressDB[currentQ.id]) progressDB[currentQ.id] = { attempts: 0, correct: 0 };
+            progressDB[currentQ.id].attempts++;
+            if (isCorrect) progressDB[currentQ.id].correct++;
 
-            if (currentQ.explanation) {
-                document.getElementById('explanation-text').innerText = currentQ.explanation;
-                document.getElementById('explanation-box').classList.remove('hidden');
+            if (currentAnswerMode === 'immediate') {
+                cards[selectedIndex].classList.add(isCorrect ? 'correct' : 'incorrect');
+                cards[selectedIndex].querySelector('i').className = isCorrect ? 'fa-solid fa-circle-check' : 'fa-solid fa-circle-xmark';
+
+                if (!isCorrect) {
+                    cards[correctIndex].classList.add('correct');
+                    cards[correctIndex].querySelector('i').className = 'fa-solid fa-circle-check';
+                }
+
+                if (currentQ.explanation) {
+                    document.getElementById('explanation-text').innerText = currentQ.explanation;
+                    document.getElementById('explanation-box').classList.remove('hidden');
+                }
             }
 
+            saveDatabase();
+            updateAllUIComponents();
             document.getElementById('btn-next-q').classList.remove('hidden');
         }
 
@@ -1503,13 +1655,141 @@
             const pct = Math.round((score / currentExamPool.length) * 100);
             document.getElementById('score-dial').innerText = `${pct}%`;
             document.getElementById('score-summary-text').innerText = `You scored ${score} out of ${currentExamPool.length} questions correctly.`;
-            
-            const reexamBtn = document.getElementById('btn-result-reexam');
-            if (wrongQuestionsIDs.size === 0) {
-                reexamBtn.style.display = 'none';
-            } else {
-                reexamBtn.style.display = 'inline-flex';
+
+            const review = document.getElementById('exam-review-container');
+            if (review) {
+                review.innerHTML = `<div class="card-header" style="margin-top:1.5rem;"><div class="card-title"><i class="fa-solid fa-list-check"></i> Final Answer Review</div></div>`;
+                const list = document.createElement('div');
+                list.className = 'review-list';
+
+                currentExamPool.forEach((q, index) => {
+                    const answer = currentExamAnswers[q.id];
+                    const selected = answer ? q.options[answer.selectedIndex] : 'Not answered';
+                    const correct = q.options[q.correctIndex];
+                    const isCorrect = answer && answer.selectedIndex === q.correctIndex;
+                    const item = document.createElement('div');
+                    item.className = `review-item ${isCorrect ? 'correct' : 'incorrect'}`;
+                    item.innerHTML = `
+                        <div class="review-question">${index + 1}. ${escapeHTML(q.question)}</div>
+                        <div class="review-answer ${isCorrect ? 'correct-text' : 'incorrect-text'}">Your answer: ${escapeHTML(selected)}</div>
+                        <div class="review-answer correct-text">Correct answer: ${escapeHTML(correct)}</div>
+                        ${q.explanation ? `<div class="review-answer"><strong>Explanation:</strong> ${escapeHTML(q.explanation)}</div>` : ''}
+                    `;
+                    list.appendChild(item);
+                });
+                review.appendChild(list);
             }
+
+            const reexamBtn = document.getElementById('btn-result-reexam');
+            if (wrongQuestionsIDs.size === 0) reexamBtn.style.display = 'none';
+            else reexamBtn.style.display = 'inline-flex';
+            updateAllUIComponents();
+        }
+
+        function escapeHTML(value) {
+            return String(value ?? '').replace(/[&<>'"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[ch]));
+        }
+
+        function getProgressStats() {
+            const total = questionsDB.length;
+            const answered = questionsDB.filter(q => (progressDB[q.id]?.attempts || 0) > 0).length;
+            const correct = questionsDB.reduce((sum, q) => sum + (progressDB[q.id]?.correct || 0), 0);
+            const attempts = questionsDB.reduce((sum, q) => sum + (progressDB[q.id]?.attempts || 0), 0);
+            return {
+                total,
+                answered,
+                correct,
+                attempts,
+                completion: total ? Math.round(answered / total * 100) : 0,
+                accuracy: attempts ? Math.round(correct / attempts * 100) : 0
+            };
+        }
+
+        function renderProgressViews() {
+            const stats = getProgressStats();
+            const sectionMap = new Map();
+
+            questionsDB.forEach(q => {
+                const section = q.section || q.category || 'General';
+                const category = q.category || 'General';
+                if (!sectionMap.has(section)) sectionMap.set(section, new Map());
+                const catMap = sectionMap.get(section);
+                if (!catMap.has(category)) catMap.set(category, []);
+                catMap.get(category).push(q);
+            });
+
+            const buildSummary = (compact = false) => {
+                let html = `<div class="progress-summary-grid">
+                    <div class="progress-stat"><span class="value">${stats.completion}%</span><span class="label">Overall completion</span></div>
+                    <div class="progress-stat"><span class="value">${stats.answered}/${stats.total}</span><span class="label">Questions practiced</span></div>
+                    <div class="progress-stat"><span class="value">${stats.accuracy}%</span><span class="label">Accuracy</span></div>
+                    <div class="progress-stat"><span class="value">${stats.attempts}</span><span class="label">Total attempts</span></div>
+                </div>`;
+
+                if (sectionMap.size === 0) return html + '<div class="progress-empty">No question bank is loaded yet.</div>';
+
+                html += '<div class="progress-sections">';
+                [...sectionMap.entries()].sort((a,b) => a[0].localeCompare(b[0])).forEach(([section, catMap], sectionIndex) => {
+                    const qs = [...catMap.values()].flat();
+                    const answered = qs.filter(q => (progressDB[q.id]?.attempts || 0) > 0).length;
+                    const completion = qs.length ? Math.round(answered / qs.length * 100) : 0;
+                    const attempts = qs.reduce((n,q) => n + (progressDB[q.id]?.attempts || 0), 0);
+                    const correct = qs.reduce((n,q) => n + (progressDB[q.id]?.correct || 0), 0);
+                    const accuracy = attempts ? Math.round(correct / attempts * 100) : 0;
+                    html += `<details class="progress-section" ${compact ? '' : (sectionIndex === 0 ? 'open' : '')}>
+                        <summary>
+                            <i class="fa-solid fa-folder-tree" style="color:var(--primary);"></i>
+                            <div class="progress-section-title"><strong>${escapeHTML(section)}</strong><span>${answered}/${qs.length} practiced · ${accuracy}% accuracy</span></div>
+                            <span class="progress-percent">${completion}%</span>
+                            <i class="fa-solid fa-chevron-down" style="color:var(--text-muted);"></i>
+                        </summary>
+                        <div class="progress-section-body">
+                            <div class="progress-bar"><span style="width:${completion}%"></span></div>`;
+                    [...catMap.entries()].sort((a,b) => a[0].localeCompare(b[0])).forEach(([category, catQs]) => {
+                        const cAnswered = catQs.filter(q => (progressDB[q.id]?.attempts || 0) > 0).length;
+                        const cAttempts = catQs.reduce((n,q) => n + (progressDB[q.id]?.attempts || 0), 0);
+                        const cCorrect = catQs.reduce((n,q) => n + (progressDB[q.id]?.correct || 0), 0);
+                        const cAccuracy = cAttempts ? Math.round(cCorrect / cAttempts * 100) : 0;
+                        const cCompletion = catQs.length ? Math.round(cAnswered / catQs.length * 100) : 0;
+                        html += `<div class="progress-category-row">
+                            <div class="progress-category-head"><span>${escapeHTML(category)}</span><span>${cAnswered}/${catQs.length} · ${cAccuracy}% accuracy</span></div>
+                            <div class="progress-bar"><span style="width:${cCompletion}%"></span></div>
+                        </div>`;
+                    });
+                    html += '</div></details>';
+                });
+                html += '</div>';
+                return html;
+            };
+
+            const dashboard = document.getElementById('dashboard-progress-summary');
+            if (dashboard) dashboard.innerHTML = buildSummary(true);
+            const full = document.getElementById('full-progress-summary');
+            if (full) full.innerHTML = buildSummary(false);
+
+            const sidebar = document.getElementById('sidebar-progress-widget');
+            const sidePct = document.getElementById('side-progress-percent');
+            if (sidePct) sidePct.innerText = `${stats.completion}%`;
+            if (sidebar) {
+                const topSections = [...sectionMap.entries()].sort((a,b) => a[0].localeCompare(b[0])).slice(0, 4);
+                sidebar.innerHTML = `<div class="sidebar-progress-card">
+                    <div class="sidebar-progress-head"><span>Progress</span><span>${stats.completion}% complete</span></div>
+                    <div class="progress-bar"><span style="width:${stats.completion}%"></span></div>
+                    ${topSections.map(([section, catMap]) => {
+                        const qs=[...catMap.values()].flat();
+                        const done=qs.filter(q => (progressDB[q.id]?.attempts || 0)>0).length;
+                        const pct=qs.length ? Math.round(done/qs.length*100) : 0;
+                        return `<div class="sidebar-progress-item"><div><span>${escapeHTML(section)}</span><span>${pct}%</span></div><div class="progress-bar"><span style="width:${pct}%"></span></div></div>`;
+                    }).join('')}
+                </div>`;
+            }
+        }
+
+        function resetProgress() {
+            if (!confirm('Reset all learning progress? Your question bank and mistakes will remain.')) return;
+            progressDB = {};
+            saveDatabase();
+            updateAllUIComponents();
         }
 
         // --- FILE UPLOAD & DATA MANAGEMENT ---
@@ -1601,8 +1881,10 @@
             if (confirm('Are you sure you want to completely wipe all saved questions and reset the app?')) {
                 localStorage.removeItem('med64_questions');
                 localStorage.removeItem('med64_wrongs');
+                localStorage.removeItem('med64_progress');
                 questionsDB = getInitialSampleData();
                 wrongQuestionsIDs.clear();
+                progressDB = {};
                 saveDatabase();
                 updateAllUIComponents();
                 alert('Database reset to initial state.');
