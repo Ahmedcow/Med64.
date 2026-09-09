@@ -1,25 +1,20 @@
 {
-  "version": "1.0",
+  "version": "2.0",
   "files": [
     {
-      "file": "anatomy.json",
-      "section": "Anatomy"
+      "file": "cardiology.json",
+      "section": "Medicine",
+      "category": "Cardiology"
     },
     {
-      "file": "cardiology.json",
-      "section": "Cardiology"
+      "file": "anatomy.json",
+      "section": "Basic Sciences",
+      "category": "Anatomy"
     },
     {
       "file": "pharmacology.json",
-      "section": "Pharmacology"
-    },
-    {
-      "file": "para3.json",
-      "section": "Parasitology"
-    },
-    {
-      "file": "pharma25.json",
-      "section": "pharmacology"
+      "section": "Medicine",
+      "category": "Pharmacology"
     }
   ]
 }
