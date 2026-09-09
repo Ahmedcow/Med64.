@@ -787,6 +787,21 @@
         .review-answer.incorrect-text { color:var(--danger); font-weight:800; }
         .sidebar-menu .nav-item.progress-nav { margin-bottom: .15rem; }
 
+        .option-card.selected {
+            border-color: var(--primary);
+            background: var(--primary-light);
+            box-shadow: 0 0 0 2px rgba(2, 132, 199, 0.12);
+        }
+        .option-card.selected i { color: var(--primary) !important; }
+        .option-card.disabled { cursor: default; }
+        .bank-status {
+            margin-top: 1rem; padding: .8rem 1rem; border-radius: var(--radius-md);
+            background: var(--bg-main); border: 1px solid var(--border-color);
+            color: var(--text-muted); font-size: .82rem; line-height: 1.5;
+        }
+        .bank-status.success { border-color: var(--success); }
+        .bank-status.error { border-color: var(--danger); }
+        .bank-actions { display:flex; gap:.75rem; flex-wrap:wrap; margin-top:1rem; }
         .hidden { display: none !important; }
 
         /* Mobile Breakpoints & Responsive Drawer */
@@ -1112,6 +1127,16 @@
                         </button>
                     </div>
 
+                    <div class="bank-status" id="builtin-bank-status">Built-in bank: loading from <strong>questions.json</strong> or <strong>questions/index.json</strong>…</div>
+                    <div class="bank-actions">
+                        <button class="btn btn-secondary" id="btn-refresh-built-in">
+                            <i class="fa-solid fa-arrows-rotate"></i> Refresh Built-in Bank
+                        </button>
+                        <button class="btn btn-secondary" id="btn-builtin-template">
+                            <i class="fa-solid fa-file-code"></i> Download GitHub Template
+                        </button>
+                    </div>
+
                     <div style="margin-top: 1.75rem; display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap;">
                         <button class="btn btn-secondary" id="btn-sample-json">
                             <i class="fa-solid fa-download"></i> Download Sample Format
@@ -1234,6 +1259,13 @@
             document.getElementById('btn-results-home')?.addEventListener('click', () => navigateTo('dashboard'));
             document.getElementById('btn-result-reexam')?.addEventListener('click', startMistakesExam);
             document.getElementById('btn-reset-progress')?.addEventListener('click', resetProgress);
+            document.getElementById('btn-refresh-built-in')?.addEventListener('click', async () => {
+                const btn = document.getElementById('btn-refresh-built-in');
+                if (btn) btn.disabled = true;
+                await loadBuiltInQuestions();
+                if (btn) btn.disabled = false;
+            });
+            document.getElementById('btn-builtin-template')?.addEventListener('click', downloadBuiltinTemplate);
 
             // FILE UPLOAD LISTENERS (Drag & Drop + Input Click)
             const dropZone = document.getElementById('drop-zone');
@@ -1299,156 +1331,135 @@
         }
 
         // --- BUILT-IN GITHUB / VERCEL QUESTION BANK ---
-        // Question files are listed in /questions/index.json.
-        // Each manifest entry can rename/re-group a file WITHOUT changing this HTML.
-        // Example:
-        // { "file": "lecture1.json", "section": "Cardiology", "category": "Heart Failure" }
-        // Multiple files may use the same section.
-        // Stable unique key for each question. Built-in/GitHub questions use their source file + id,
-        // so identical IDs in different JSON files never collide. Imported/local questions use their id.
+        // Preferred easy mode: put ONE file named /questions.json beside index.html.
+        // Each question can contain its own section/category. This is the easiest way
+        // to maintain a large bank in GitHub.
+        // Advanced mode: /questions/index.json can list multiple JSON files and can
+        // override section/category names for each file.
+        function normalizeQuestion(raw, sourceFile, index, manifestEntry = {}) {
+            if (!raw || typeof raw !== 'object' || !raw.question || !Array.isArray(raw.options) || raw.options.length < 2) return null;
+            const copy = { ...raw };
+            const fallbackId = `auto_${simpleHash(String(copy.question))}_${index}`;
+            copy.id = String(copy.id || fallbackId);
+
+            // Support the normal correctIndex format and a few friendly alternatives.
+            let ci = Number.isInteger(copy.correctIndex) ? copy.correctIndex : parseInt(copy.correctIndex, 10);
+            if (!Number.isInteger(ci) || ci < 0 || ci >= copy.options.length) {
+                const answer = copy.correctAnswer ?? copy.answer ?? copy.correct;
+                if (typeof answer === 'number' || (typeof answer === 'string' && /^\d+$/.test(answer))) {
+                    const n = parseInt(answer, 10);
+                    ci = (n >= 0 && n < copy.options.length) ? n : (n > 0 && n <= copy.options.length ? n - 1 : -1);
+                } else if (typeof answer === 'string') {
+                    ci = copy.options.findIndex(o => String(o).trim().toLowerCase() === answer.trim().toLowerCase());
+                }
+            }
+            if (!Number.isInteger(ci) || ci < 0 || ci >= copy.options.length) return null;
+            copy.correctIndex = ci;
+
+            copy.section = manifestEntry.section || copy.section || copy.category || 'General';
+            copy.category = manifestEntry.category || copy.category || copy.section || 'General';
+            copy._med64Builtin = true;
+            copy._med64SourceFile = sourceFile;
+            return copy;
+        }
+
+        function simpleHash(text) {
+            let h = 2166136261;
+            for (let i = 0; i < text.length; i++) h = Math.imul(h ^ text.charCodeAt(i), 16777619);
+            return (h >>> 0).toString(36);
+        }
+
         function getQuestionKey(q) {
             if (!q) return '';
             if (q._med64Builtin && q._med64SourceFile) return `github:${q._med64SourceFile}::${q.id}`;
             return `local:${q.id}`;
         }
 
+        function getQuestionKeyFromParts(sourceFile, id) {
+            return `github:${sourceFile}::${id}`;
+        }
+
+        async function fetchQuestionFile(path, sourceFile, manifestEntry = {}) {
+            const response = await fetch(path, { cache: 'no-store' });
+            if (!response.ok) throw new Error(`${sourceFile}: HTTP ${response.status}`);
+            const data = await response.json();
+            const questions = Array.isArray(data) ? data : (Array.isArray(data.questions) ? data.questions : null);
+            if (!questions) throw new Error(`${sourceFile}: JSON must be an array or {"questions":[...]}.`);
+            return questions.map((q, i) => normalizeQuestion(q, sourceFile, i, manifestEntry)).filter(Boolean);
+        }
+
         async function loadBuiltInQuestions() {
-            const BUILTIN_IDS_KEY = 'med64_builtin_question_ids';
+            const status = document.getElementById('builtin-bank-status');
+            const setStatus = (text, type='') => { if (status) { status.className = `bank-status ${type}`; status.innerHTML = text; } };
+            const BUILTIN_KEYS = 'med64_builtin_question_keys_v3';
             try {
-                const manifestResponse = await fetch('./questions/index.json', { cache: 'no-store' });
-                if (!manifestResponse.ok) throw new Error(`Manifest HTTP ${manifestResponse.status}`);
+                // 1) EASY MODE: single questions.json at repository root.
+                let builtInData = [];
+                let sourceMode = '';
+                try {
+                    builtInData = await fetchQuestionFile('./questions.json', 'questions.json');
+                    sourceMode = 'single file';
+                } catch (_) {
+                    // 2) ADVANCED MODE: multi-file manifest.
+                    const manifestResponse = await fetch('./questions/index.json', { cache: 'no-store' });
+                    if (!manifestResponse.ok) throw new Error(`Could not load questions.json or questions/index.json (HTTP ${manifestResponse.status}).`);
+                    const manifest = await manifestResponse.json();
+                    const files = Array.isArray(manifest) ? manifest : manifest.files;
+                    if (!Array.isArray(files)) throw new Error('questions/index.json must contain a files array.');
+                    const entries = files.map(e => typeof e === 'string' ? { file:e } : (e || {})).filter(e => e.file);
+                    const results = await Promise.all(entries.map(e => fetchQuestionFile(`./questions/${e.file}`, e.file, e)));
+                    builtInData = results.flat();
+                    sourceMode = `manifest (${entries.length} file${entries.length === 1 ? '' : 's'})`;
+                }
 
-                const manifest = await manifestResponse.json();
-                const files = Array.isArray(manifest) ? manifest : manifest.files;
-                if (!Array.isArray(files)) throw new Error('questions/index.json must contain a files array.');
+                // Built-in bank is authoritative. Remove every previous built-in question,
+                // then insert the current files. Progress/wrong data survives because it is
+                // stored by the stable source-file + question-id key.
+                const oldKeys = new Set(JSON.parse(localStorage.getItem(BUILTIN_KEYS) || '[]'));
+                questionsDB = questionsDB.filter(q => !q._med64Builtin && !oldKeys.has(getQuestionKey(q)) && !oldKeys.has(q.id));
 
-                const entries = files.map(entry => {
-                    if (typeof entry === 'string') return { file: entry };
-                    return entry || {};
-                }).filter(entry => entry.file);
-
-                const results = await Promise.all(entries.map(async entry => {
-                    const response = await fetch(`./questions/${entry.file}`, { cache: 'no-store' });
-                    if (!response.ok) throw new Error(`${entry.file}: HTTP ${response.status}`);
-
-                    const data = await response.json();
-                    const questions = Array.isArray(data)
-                        ? data
-                        : (Array.isArray(data.questions) ? data.questions : []);
-
-                    // Manifest values override values inside the JSON file.
-                    // This lets you rename a section/category or put multiple files
-                    // into the same section without touching index.html.
-                    return questions.map(q => ({
-                        ...q,
-                        section: entry.section || q.section || q.category || 'General',
-                        category: entry.category || q.category || entry.section || q.section || 'General',
-                        _med64Builtin: true,
-                        _med64SourceFile: entry.file
-                    }));
-                }));
-
-                const builtInData = results.flat();
-                const previousBuiltInIDs = new Set(JSON.parse(localStorage.getItem(BUILTIN_IDS_KEY) || '[]'));
-                const currentBuiltInIDs = new Set();
-
-                // Remove old GitHub questions that are no longer present in the manifest.
-                // Non-GitHub/imported questions are preserved.
-                questionsDB = questionsDB.filter(q => {
+                const currentKeys = new Set();
+                const seenKeys = new Set();
+                builtInData.forEach((q, i) => {
+                    if (!q) return;
                     const key = getQuestionKey(q);
-                    return !q._med64Builtin && !previousBuiltInIDs.has(key) && !previousBuiltInIDs.has(q.id);
+                    if (seenKeys.has(key)) return; // duplicate source/id in the bank
+                    seenKeys.add(key);
+                    currentKeys.add(key);
+                    questionsDB.push(q);
                 });
 
-                const existingByKey = new Map(questionsDB.map((q, index) => [getQuestionKey(q), index]));
-                let added = 0;
+                // Migrate old progress/wrong keys when possible. This prevents the upgrade
+                // from wiping existing learning history from the previous app version.
+                const migratedProgress = {};
+                Object.entries(progressDB || {}).forEach(([key, value]) => {
+                    if (currentKeys.has(key)) migratedProgress[key] = value;
+                });
+                questionsDB.forEach(q => {
+                    const newKey = getQuestionKey(q);
+                    if (!q._med64Builtin) return;
+                    const legacyKey = `local:${q.id}`;
+                    if (!migratedProgress[newKey] && progressDB[legacyKey]) migratedProgress[newKey] = progressDB[legacyKey];
+                });
+                progressDB = migratedProgress;
 
-                builtInData.forEach((q, index) => {
-                    if (!q || !q.question || !Array.isArray(q.options)) return;
-
-                    const copy = { ...q };
-                    if (!copy.id) {
-                        copy.id = `builtin_${Date.now()}_${index}_${Math.random().toString(36).slice(2, 8)}`;
-                    }
-
-                    // Keep section/category names controlled by the manifest.
-                    copy.section = copy.section || copy.category || 'General';
-                    copy.category = copy.category || copy.section || 'General';
-                    const questionKey = getQuestionKey(copy);
-                    currentBuiltInIDs.add(questionKey);
-
-                    if (existingByKey.has(questionKey)) {
-                        questionsDB[existingByKey.get(questionKey)] = copy;
-                    } else {
-                        existingByKey.set(questionKey, questionsDB.length);
-                        questionsDB.push(copy);
-                        added++;
-                    }
+                const oldWrong = new Set(wrongQuestionsIDs);
+                wrongQuestionsIDs = new Set();
+                questionsDB.forEach(q => {
+                    const key = getQuestionKey(q);
+                    if (oldWrong.has(key) || oldWrong.has(`local:${q.id}`) || oldWrong.has(q.id)) wrongQuestionsIDs.add(key);
                 });
 
-                localStorage.setItem(BUILTIN_IDS_KEY, JSON.stringify([...currentBuiltInIDs]));
+                localStorage.setItem(BUILTIN_KEYS, JSON.stringify([...currentKeys]));
                 saveDatabase();
                 updateAllUIComponents();
-
-                console.log(`GitHub question bank loaded: ${builtInData.length} questions from ${entries.length} files; ${added} new questions added.`);
+                setStatus(`<strong>Built-in bank ready:</strong> ${builtInData.length} valid questions loaded using ${sourceMode}. Section/category names now come from the current JSON.`, 'success');
+                console.log(`Med64 built-in bank loaded: ${builtInData.length} questions via ${sourceMode}.`);
             } catch (error) {
-                console.error('GitHub question bank could not be loaded:', error);
-                console.warn('Check /questions/index.json and every listed JSON file.');
+                console.error('Built-in question bank could not be loaded:', error);
+                setStatus(`<strong>Built-in bank not loaded.</strong> ${escapeHTML(error.message)}<br>Use <strong>questions.json</strong> for the easiest setup, or check <strong>questions/index.json</strong>.`, 'error');
+                updateAllUIComponents();
             }
-        }
-
-        // --- NAVIGATION & ROUTING ---
-        function navigateTo(viewId, navElement = null) {
-            const views = ['dashboard', 'progress', 'categories', 'custom-test', 'mistakes', 'upload', 'quiz', 'results'];
-            views.forEach(v => {
-                const el = document.getElementById(`view-${v}`);
-                if (el) el.classList.add('hidden');
-            });
-
-            const targetView = document.getElementById(`view-${viewId}`);
-            if (targetView) targetView.classList.remove('hidden');
-
-            const titleMap = {
-                'dashboard': '<i class="fa-solid fa-chart-line" style="color: var(--primary);"></i><span>Dashboard Overview</span>',
-                'categories': '<i class="fa-solid fa-layer-group" style="color: var(--primary);"></i><span>Subject Categories</span>',
-                'progress': '<i class="fa-solid fa-chart-simple" style="color: var(--primary);"></i><span>Learning Progress</span>',
-                'custom-test': '<i class="fa-solid fa-sliders" style="color: var(--primary);"></i><span>Custom Examination</span>',
-                'mistakes': '<i class="fa-solid fa-triangle-exclamation" style="color: var(--danger);"></i><span>Mistakes Memory Bank</span>',
-                'upload': '<i class="fa-solid fa-file-arrow-up" style="color: var(--primary);"></i><span>Import MCQ Files</span>',
-                'quiz': '<i class="fa-solid fa-pen-to-square" style="color: var(--primary);"></i><span>Active Examination Session</span>',
-                'results': '<i class="fa-solid fa-square-poll-vertical" style="color: var(--primary);"></i><span>Session Score Report</span>'
-            };
-            document.getElementById('page-header-title').innerHTML = titleMap[viewId] || 'Med 64';
-
-            // Update sidebar highlight
-            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-            if (navElement) {
-                navElement.classList.add('active');
-            } else {
-                const matchingNav = document.querySelector(`.nav-item[data-view="${viewId}"]`);
-                if (matchingNav) matchingNav.classList.add('active');
-            }
-
-            updateAllUIComponents();
-            closeSidebar();
-        }
-
-        function toggleSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            const overlay = document.getElementById('sidebar-overlay');
-            sidebar.classList.toggle('active');
-            overlay.classList.toggle('active');
-        }
-
-        function closeSidebar() {
-            document.getElementById('sidebar').classList.remove('active');
-            document.getElementById('sidebar-overlay').classList.remove('active');
-        }
-
-        function toggleTheme() {
-            document.body.classList.toggle('dark-theme');
-            const isDark = document.body.classList.contains('dark-theme');
-            localStorage.setItem('med64_theme', isDark ? 'dark' : 'light');
-            document.getElementById('theme-icon').className = isDark ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
         }
 
         // --- UI REFRESH & RENDER ---
@@ -1632,35 +1643,44 @@
         }
 
         function selectOption(selectedIndex, correctIndex) {
-            const cards = document.querySelectorAll('.option-card');
             const currentQ = currentExamPool[currentQIndex];
-            if (currentExamAnswers[getQuestionKey(currentQ)]) return;
+            if (!currentQ || !Array.isArray(currentQ.options)) return;
+            const key = getQuestionKey(currentQ);
+            if (currentExamAnswers[key]) return;
 
-            currentExamAnswers[getQuestionKey(currentQ)] = { selectedIndex, correctIndex };
+            // Store the user's choice FIRST. Delayed-answer mode still records and
+            // visibly selects the option; it simply hides correctness until Results.
+            currentExamAnswers[key] = { selectedIndex, correctIndex: currentQ.correctIndex };
+            const cards = document.querySelectorAll('.option-card');
             cards.forEach(c => c.classList.add('disabled'));
+            cards.forEach((c, i) => {
+                const icon = c.querySelector('i');
+                if (i === selectedIndex) {
+                    c.classList.add('selected');
+                    if (icon) icon.className = 'fa-solid fa-circle-dot';
+                }
+            });
 
-            const isCorrect = selectedIndex === correctIndex;
+            const isCorrect = selectedIndex === currentQ.correctIndex;
             if (isCorrect) {
                 score++;
-                wrongQuestionsIDs.delete(getQuestionKey(currentQ));
+                wrongQuestionsIDs.delete(key);
             } else {
-                wrongQuestionsIDs.add(getQuestionKey(currentQ));
+                wrongQuestionsIDs.add(key);
             }
 
-            // Record long-term progress per question.
-            if (!progressDB[getQuestionKey(currentQ)]) progressDB[getQuestionKey(currentQ)] = { attempts: 0, correct: 0 };
-            progressDB[getQuestionKey(currentQ)].attempts++;
-            if (isCorrect) progressDB[getQuestionKey(currentQ)].correct++;
+            if (!progressDB[key]) progressDB[key] = { attempts: 0, correct: 0 };
+            progressDB[key].attempts = Number(progressDB[key].attempts || 0) + 1;
+            if (isCorrect) progressDB[key].correct = Number(progressDB[key].correct || 0) + 1;
 
             if (currentAnswerMode === 'immediate') {
+                cards[selectedIndex].classList.remove('selected');
                 cards[selectedIndex].classList.add(isCorrect ? 'correct' : 'incorrect');
                 cards[selectedIndex].querySelector('i').className = isCorrect ? 'fa-solid fa-circle-check' : 'fa-solid fa-circle-xmark';
-
-                if (!isCorrect) {
-                    cards[correctIndex].classList.add('correct');
-                    cards[correctIndex].querySelector('i').className = 'fa-solid fa-circle-check';
+                if (!isCorrect && cards[currentQ.correctIndex]) {
+                    cards[currentQ.correctIndex].classList.add('correct');
+                    cards[currentQ.correctIndex].querySelector('i').className = 'fa-solid fa-circle-check';
                 }
-
                 if (currentQ.explanation) {
                     document.getElementById('explanation-text').innerText = currentQ.explanation;
                     document.getElementById('explanation-box').classList.remove('hidden');
@@ -1682,6 +1702,7 @@
         }
 
         function finishExam() {
+            if (!currentExamPool.length) return;
             clearInterval(examTimerInterval);
             examTimerInterval = null;
             const timer = document.getElementById('exam-timer');
@@ -1706,7 +1727,8 @@
                     item.className = `review-item ${isCorrect ? 'correct' : 'incorrect'}`;
                     item.innerHTML = `
                         <div class="review-question">${index + 1}. ${escapeHTML(q.question)}</div>
-                        <div class="review-answer ${isCorrect ? 'correct-text' : 'incorrect-text'}">Your answer: ${escapeHTML(selected)}</div>
+                        <div class="helper-text">${escapeHTML(q.section || 'General')} · ${escapeHTML(q.category || 'General')}</div>
+                        <div class="review-answer ${answer ? (isCorrect ? 'correct-text' : 'incorrect-text') : 'incorrect-text'}">Your answer: ${escapeHTML(selected)}</div>
                         <div class="review-answer correct-text">Correct answer: ${escapeHTML(correct)}</div>
                         ${q.explanation ? `<div class="review-answer"><strong>Explanation:</strong> ${escapeHTML(q.explanation)}</div>` : ''}
                     `;
@@ -1934,6 +1956,28 @@
             a.href = url;
             a.download = 'med64_sample_bank.json';
             a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function downloadBuiltinTemplate() {
+            const sample = {
+                version: '1.0',
+                questions: [
+                    {
+                        id: 'medicine-001',
+                        section: 'Medicine',
+                        category: 'Cardiology',
+                        question: 'Example question?',
+                        options: ['Option A', 'Option B', 'Option C', 'Option D'],
+                        correctIndex: 1,
+                        explanation: 'Optional explanation.'
+                    }
+                ]
+            };
+            const blob = new Blob([JSON.stringify(sample, null, 2)], {type:'application/json'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url; a.download = 'questions.json'; a.click();
             URL.revokeObjectURL(url);
         }
 

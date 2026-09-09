@@ -1,0 +1,23 @@
+{
+  "version": "1.0",
+  "questions": [
+    {
+      "id": "cardio-001",
+      "section": "Medicine",
+      "category": "Cardiology",
+      "question": "Which cardiac biomarker is most specific for myocardial infarction?",
+      "options": ["CK-MB", "Troponin I", "Myoglobin", "LDH-1"],
+      "correctIndex": 1,
+      "explanation": "Troponin I is highly specific for myocardial injury."
+    },
+    {
+      "id": "pharma-001",
+      "section": "Medicine",
+      "category": "Pharmacology",
+      "question": "Which drug class is commonly used to reduce albuminuria in diabetic kidney disease?",
+      "options": ["ACE inhibitors", "Antacids", "Nitrates", "Antihistamines"],
+      "correctIndex": 0,
+      "explanation": "Renin-angiotensin system blockade can reduce intraglomerular pressure and albuminuria."
+    }
+  ]
+}
