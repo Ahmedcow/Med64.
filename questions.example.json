@@ -1,0 +1,11 @@
+[
+  {
+    "id": "pharma25-001",
+    "section": "Pharmacology",
+    "category": "Pharma25",
+    "question": "Which cardiac biomarker is most specific for myocardial injury?",
+    "options": ["CK-MB", "Troponin I", "Myoglobin", "LDH"],
+    "correctIndex": 1,
+    "explanation": "Cardiac troponins are highly specific for myocardial injury."
+  }
+]
