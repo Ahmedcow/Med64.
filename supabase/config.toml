@@ -1,0 +1,2 @@
+[functions.med64-admin]
+verify_jwt = true
